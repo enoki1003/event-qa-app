@@ -4,8 +4,15 @@ import { QRCodeSVG } from "qrcode.react";
 import { isHostAuth } from "./HostLogin";
 import { useRoomById } from "../hooks/useRoom";
 import { useQuestions, approveQuestion, rejectQuestion, markAnswered, toggleHidden, addReply } from "../hooks/useQuestions";
-import { toggleRoomOpen, addSession, setActiveSession, deleteSession } from "../hooks/useRooms";
-import type { Question, Session } from "../types";
+import { toggleRoomOpen, addSession, setActiveSession, deleteSession, updateRoomSettings } from "../hooks/useRooms";
+import type { AuthorMode, Question, RoomSettings, Session } from "../types";
+
+const AUTHOR_OPTIONS: { value: AuthorMode; label: string }[] = [
+  { value: "anonymous", label: "匿名" },
+  { value: "both_optional", label: "会社名（任意）/ 名前（任意）" },
+  { value: "company_req_name_opt", label: "会社名（必須）/ 名前（任意）" },
+  { value: "both_required", label: "会社名（必須）/ 名前（必須）" },
+];
 
 type QFilter = "all" | "pending" | "approved" | "answered";
 
@@ -60,7 +67,8 @@ export default function HostRoom() {
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [newSessionDescription, setNewSessionDescription] = useState("");
   const [addingSession, setAddingSession] = useState(false);
-  const [tab, setTab] = useState<"questions" | "sessions">("questions");
+  const [tab, setTab] = useState<"questions" | "sessions" | "settings">("questions");
+  const [savingSettings, setSavingSettings] = useState(false);
 
   useEffect(() => {
     if (!isHostAuth()) navigate("/host");
@@ -195,22 +203,22 @@ export default function HostRoom() {
         <div className={`px-4 py-1.5 text-xs font-medium text-center ${
           !activeSessionId ? "bg-gray-100 text-gray-500"
           : activeSessionId === "ALL" ? "bg-blue-50 text-blue-700"
-          : "bg-amber-50 text-amber-600"
+          : "bg-indigo-50 text-indigo-600"
         }`}>
           {currentLabel}
         </div>
 
         {/* Tab */}
         <div className="max-w-3xl mx-auto px-4 flex gap-4 border-t border-gray-50">
-          {(["questions", "sessions"] as const).map((t) => (
+          {(["questions", "sessions", "settings"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`py-2 text-sm font-medium border-b-2 transition-colors ${
-                tab === t ? "border-orange-500 text-amber-500" : "border-transparent text-gray-500 hover:text-gray-700"
+                tab === t ? "border-indigo-600 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
-              {t === "questions" ? "質問" : "セッション"}
+              {t === "questions" ? "質問" : t === "sessions" ? "セッション" : "設定"}
             </button>
           ))}
         </div>
@@ -222,13 +230,18 @@ export default function HostRoom() {
           <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
             <QRCodeSVG value={roomUrl} size={240} />
             <p className="text-sm text-gray-500 font-mono text-center break-all max-w-xs">{roomUrl}</p>
-            <button onClick={() => navigator.clipboard.writeText(roomUrl)} className="text-sm text-amber-500 hover:underline">URLをコピー</button>
+            <button onClick={() => navigator.clipboard.writeText(roomUrl)} className="text-sm text-indigo-500 hover:underline">URLをコピー</button>
             <button onClick={() => setShowQr(false)} className="text-sm text-gray-400 hover:text-gray-600">閉じる</button>
           </div>
         </div>
       )}
 
       <div className="max-w-3xl mx-auto px-4 pt-4">
+        {/* ---- 設定タブ ---- */}
+        {tab === "settings" && (
+          <SettingsPanel room={room} onSaved={() => {}} />
+        )}
+
         {/* ---- セッション管理タブ ---- */}
         {tab === "sessions" && (
           <div className="space-y-4">
@@ -265,7 +278,7 @@ export default function HostRoom() {
                 <p className="text-sm font-medium text-gray-700">セッション一覧</p>
                 <button
                   onClick={() => setShowSessionForm(true)}
-                  className="text-xs text-amber-500 hover:underline"
+                  className="text-xs text-indigo-500 hover:underline"
                 >
                   ＋ セッション追加
                 </button>
@@ -278,7 +291,7 @@ export default function HostRoom() {
                     value={newSessionTitle}
                     onChange={(e) => setNewSessionTitle(e.target.value)}
                     placeholder="セッション名（例: 第1部 Q&A）"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
                     autoFocus
                     required
                   />
@@ -287,13 +300,13 @@ export default function HostRoom() {
                     value={newSessionDescription}
                     onChange={(e) => setNewSessionDescription(e.target.value)}
                     placeholder="参加者への案内テキスト（任意）例: ご質問はこちらへどうぞ！"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
                   />
                   <div className="flex gap-2">
                     <button
                       type="submit"
                       disabled={addingSession}
-                      className="px-3 py-2 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 disabled:opacity-40"
+                      className="px-3 py-2 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 disabled:opacity-40"
                     >
                       追加
                     </button>
@@ -319,7 +332,7 @@ export default function HostRoom() {
                       <div
                         key={session.id}
                         className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                          isActive ? "bg-amber-50 border-amber-200" : "bg-gray-50 border-gray-100"
+                          isActive ? "bg-indigo-50 border-indigo-200" : "bg-gray-50 border-gray-100"
                         }`}
                       >
                         <span className="text-xs text-gray-400 w-5 text-center">{i + 1}</span>
@@ -328,13 +341,13 @@ export default function HostRoom() {
                           <p className="text-xs text-gray-400">{sessionQCount}件の質問</p>
                         </div>
                         {isActive && (
-                          <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">受付中</span>
+                          <span className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full">受付中</span>
                         )}
                         <div className="flex gap-1">
                           {!isActive && (
                             <button
                               onClick={() => handleStartSession(session.id)}
-                              className="px-2 py-1 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600"
+                              className="px-2 py-1 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700"
                             >
                               開始
                             </button>
@@ -411,7 +424,7 @@ export default function HostRoom() {
                   key={f.key}
                   onClick={() => setQFilter(f.key)}
                   className={`flex-shrink-0 px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
-                    qFilter === f.key ? "bg-orange-500 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    qFilter === f.key ? "bg-indigo-600 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   {f.label}
@@ -478,12 +491,12 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
   const statusBadge = (status: Question["status"]) => {
     if (status === "approved") return <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">承認済み</span>;
     if (status === "rejected") return <span className="text-xs bg-red-100 text-red-500 px-2 py-0.5 rounded-full">却下</span>;
-    return <span className="text-xs bg-orange-100 text-amber-600 px-2 py-0.5 rounded-full">承認待ち</span>;
+    return <span className="text-xs bg-orange-100 text-indigo-600 px-2 py-0.5 rounded-full">承認待ち</span>;
   };
 
   return (
     <div className={`bg-white rounded-2xl border shadow-sm p-4 ${q.isHidden ? "opacity-50" : ""} ${
-      q.status === "pending" ? "border-amber-200" : "border-gray-100"
+      q.status === "pending" ? "border-indigo-200" : "border-gray-100"
     }`}>
       <div className="flex items-start gap-3">
         <div className="flex flex-col items-center min-w-[36px] text-gray-400">
@@ -513,7 +526,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
         <div className="mt-3 ml-10 space-y-2">
           {replies.map((r) => (
             <div key={r.id} className={`text-xs rounded-xl px-3 py-2 ${
-              r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-amber-50 border border-amber-100"
+              r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-indigo-50 border border-indigo-100"
             }`}>
               <div className="flex items-center gap-1 mb-0.5">
                 <span className="font-medium text-gray-600">返信</span>
@@ -557,7 +570,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
         </button>
         <button
           onClick={() => setShowReplyForm((v) => !v)}
-          className="px-3 py-1.5 border border-amber-200 text-amber-500 text-xs rounded-lg hover:bg-amber-50"
+          className="px-3 py-1.5 border border-indigo-200 text-indigo-500 text-xs rounded-lg hover:bg-indigo-50"
         >
           返信する
         </button>
@@ -571,7 +584,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
             onChange={(e) => setReplyText(e.target.value)}
             placeholder="返信内容を入力..."
             rows={2}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
             required
             autoFocus
           />
@@ -581,7 +594,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
                 type="checkbox"
                 checked={!isPrivate}
                 onChange={(e) => setIsPrivate(!e.target.checked)}
-                className="w-3.5 h-3.5 accent-orange-500"
+                className="w-3.5 h-3.5 accent-indigo-600"
               />
               全体にも公開する
             </label>
@@ -596,7 +609,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
               <button
                 type="submit"
                 disabled={!replyText.trim() || sendingReply}
-                className="px-3 py-1.5 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 disabled:opacity-40"
+                className="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 disabled:opacity-40"
               >
                 {sendingReply ? "送信中..." : isPrivate ? "送信（投稿者のみ）" : "送信（全体に公開）"}
               </button>
@@ -605,5 +618,113 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
         </form>
       )}
     </div>
+  );
+}
+
+// ---- 設定パネル ----
+function SettingsPanel({ room, onSaved }: { room: any; onSaved: () => void }) {
+  const [title, setTitle] = useState(room.title || "");
+  const [description, setDescription] = useState(room.description || "");
+  const [settings, setSettings] = useState<RoomSettings>({
+    authorMode: "anonymous",
+    slackWebhookUrl: "",
+    requireApproval: false,
+    showTimestamp: false,
+    ...room.settings,
+  });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await updateRoomSettings(room.id, title, description, settings);
+      setSaved(true);
+      onSaved();
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const upd = (patch: Partial<RoomSettings>) =>
+    setSettings((s) => ({ ...s, ...patch }));
+
+  return (
+    <form onSubmit={handleSave} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+      <h2 className="font-semibold text-gray-800">イベント設定</h2>
+      <div>
+        <label className="text-sm font-medium text-gray-700">タイトル</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+          required
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium text-gray-700">イベント説明</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={2}
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none text-sm"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium text-gray-700">投稿者情報</label>
+        <select
+          value={settings.authorMode}
+          onChange={(e) => upd({ authorMode: e.target.value as AuthorMode })}
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+        >
+          {AUTHOR_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={settings.requireApproval}
+            onChange={(e) => upd({ requireApproval: e.target.checked })}
+            className="w-4 h-4 accent-indigo-600"
+          />
+          承認制にする（承認後に参加者画面に表示）
+        </label>
+        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={settings.showTimestamp}
+            onChange={(e) => upd({ showTimestamp: e.target.checked })}
+            className="w-4 h-4 accent-indigo-600"
+          />
+          投稿日時を表示する
+        </label>
+      </div>
+      <div>
+        <label className="text-sm font-medium text-gray-700">Slack Webhook URL（任意）</label>
+        <input
+          type="url"
+          value={settings.slackWebhookUrl}
+          onChange={(e) => upd({ slackWebhookUrl: e.target.value })}
+          placeholder="https://hooks.slack.com/services/..."
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+        />
+      </div>
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={saving}
+          className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-40"
+        >
+          {saving ? "保存中..." : "保存"}
+        </button>
+        {saved && <span className="text-sm text-green-600">保存しました</span>}
+      </div>
+    </form>
   );
 }

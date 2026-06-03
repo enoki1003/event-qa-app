@@ -91,7 +91,7 @@ export default function HostDashboard() {
           <h1 className="text-xl font-bold text-gray-900">イベント管理</h1>
           <button
             onClick={openCreate}
-            className="px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-xl hover:bg-orange-600 transition-colors"
+            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors"
           >
             ＋ 新規イベント
           </button>
@@ -111,7 +111,7 @@ export default function HostDashboard() {
                     type="text"
                     value={form.title}
                     onChange={(e) => updateForm({ title: e.target.value })}
-                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     required
                   />
                 </div>
@@ -121,7 +121,7 @@ export default function HostDashboard() {
                     value={form.description}
                     onChange={(e) => updateForm({ description: e.target.value })}
                     rows={2}
-                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
                   />
                 </div>
                 <div>
@@ -129,7 +129,7 @@ export default function HostDashboard() {
                   <select
                     value={form.settings.authorMode}
                     onChange={(e) => updateSettings({ authorMode: e.target.value as AuthorMode })}
-                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   >
                     {AUTHOR_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>{o.label}</option>
@@ -142,7 +142,7 @@ export default function HostDashboard() {
                     id="approval"
                     checked={form.settings.requireApproval}
                     onChange={(e) => updateSettings({ requireApproval: e.target.checked })}
-                    className="w-4 h-4 accent-orange-500"
+                    className="w-4 h-4 accent-indigo-600"
                   />
                   <label htmlFor="approval" className="text-sm text-gray-700">
                     承認制にする（承認後に参加者画面に表示）
@@ -154,7 +154,7 @@ export default function HostDashboard() {
                     id="timestamp"
                     checked={form.settings.showTimestamp}
                     onChange={(e) => updateSettings({ showTimestamp: e.target.checked })}
-                    className="w-4 h-4 accent-orange-500"
+                    className="w-4 h-4 accent-indigo-600"
                   />
                   <label htmlFor="timestamp" className="text-sm text-gray-700">
                     投稿日時を表示する
@@ -169,7 +169,7 @@ export default function HostDashboard() {
                     value={form.settings.slackWebhookUrl}
                     onChange={(e) => updateSettings({ slackWebhookUrl: e.target.value })}
                     placeholder="https://hooks.slack.com/services/..."
-                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
                   />
                   <p className="text-xs text-gray-400 mt-1">承認した質問をリアルタイムでSlackに投稿します</p>
                 </div>
@@ -184,7 +184,7 @@ export default function HostDashboard() {
                   <button
                     type="submit"
                     disabled={!form.title.trim() || saving}
-                    className="flex-1 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 disabled:opacity-40 text-sm font-medium"
+                    className="flex-1 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-40 text-sm font-medium"
                   >
                     {saving ? "保存中..." : modal.mode === "create" ? "作成" : "保存"}
                   </button>
@@ -244,33 +244,21 @@ export default function HostDashboard() {
                 <div className="flex flex-wrap gap-2 mt-3">
                   <button
                     onClick={() => navigate(`/host/room/${room.id}`)}
-                    className="px-3 py-1.5 bg-orange-500 text-white text-xs font-medium rounded-lg hover:bg-orange-600"
+                    className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700"
                   >
                     管理
-                  </button>
-                  <button
-                    onClick={() => openEdit(room)}
-                    className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
-                  >
-                    設定編集
                   </button>
                   <button
                     onClick={() => setQrTarget(roomUrl(room.code))}
                     className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
                   >
-                    QRコード
+                    QRコピー
                   </button>
                   <button
                     onClick={() => navigator.clipboard.writeText(roomUrl(room.code))}
                     className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
                   >
                     URLコピー
-                  </button>
-                  <button
-                    onClick={() => toggleRoomOpen(room.id, !room.isOpen)}
-                    className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
-                  >
-                    {room.isOpen ? "締め切る" : "再開する"}
                   </button>
                   <button
                     onClick={() => {

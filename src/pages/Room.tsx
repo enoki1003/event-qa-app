@@ -1,9 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useRoomByCode } from "../hooks/useRoom";
 import { useQuestions, submitQuestion, toggleLike } from "../hooks/useQuestions";
 import { useSession } from "../hooks/useSession";
 import type { AuthorMode } from "../types";
+
+const STORAGE_KEY = "qa_author_info";
+
+function loadAuthorInfo(): { companyName: string; authorName: string } {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return { companyName: "", authorName: "" };
+  }
+}
+
+function saveAuthorInfo(companyName: string, authorName: string) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ companyName, authorName }));
+}
 
 function needsCompany(mode: AuthorMode) {
   return mode === "both_required" || mode === "company_req_name_opt" || mode === "both_optional";
@@ -25,12 +39,17 @@ export default function Room() {
   const { room, loading, error } = useRoomByCode(code ?? "");
   const questions = useQuestions(room?.id ?? "");
 
+  const saved = loadAuthorInfo();
   const [text, setText] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [authorName, setAuthorName] = useState("");
+  const [companyName, setCompanyName] = useState(saved.companyName || "");
+  const [authorName, setAuthorName] = useState(saved.authorName || "");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  useEffect(() => {
+    saveAuthorInfo(companyName, authorName);
+  }, [companyName, authorName]);
 
   if (loading) {
     return (
@@ -44,7 +63,7 @@ export default function Room() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
         <p className="text-red-500">{error || "ルームが見つかりません"}</p>
-        <button onClick={() => navigate("/")} className="text-amber-500 hover:underline text-sm">
+        <button onClick={() => navigate("/")} className="text-indigo-600 hover:underline text-sm">
           トップに戻る
         </button>
       </div>
@@ -56,7 +75,7 @@ export default function Room() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
         <div className="text-4xl">🔒</div>
         <p className="text-gray-600 font-medium">このルームは現在締め切られています</p>
-        <button onClick={() => navigate("/")} className="text-amber-500 hover:underline text-sm">
+        <button onClick={() => navigate("/")} className="text-indigo-600 hover:underline text-sm">
           トップに戻る
         </button>
       </div>
@@ -69,6 +88,14 @@ export default function Room() {
   const showName = needsName(mode);
   const companyRequired = isCompanyRequired(mode);
   const nameRequired = isNameRequired(mode);
+
+  const activeSessionId = room.activeSessionId ?? null;
+  const sessions = Object.entries(room.sessions || {})
+    .map(([id, s]) => ({ id, ...s }))
+    .sort((a, b) => a.order - b.order);
+  const activeSession = activeSessionId && activeSessionId !== "ALL"
+    ? sessions.find((s) => s.id === activeSessionId)
+    : null;
 
   const canSubmit =
     text.trim() &&
@@ -93,12 +120,10 @@ export default function Room() {
         { text, companyName: showCompany ? companyName : null, authorName: showName ? authorName : null },
         sessionId,
         settings,
-        room.activeSessionId ?? null,
+        activeSessionId,
         activeSession?.title ?? null
       );
       setText("");
-      setCompanyName("");
-      setAuthorName("");
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 3000);
     } catch {
@@ -112,45 +137,35 @@ export default function Room() {
     toggleLike(room.id, questionId, sessionId);
   };
 
-  const activeSessionId = room.activeSessionId ?? null;
-  const sessions = Object.entries(room.sessions || {})
-    .map(([id, s]) => ({ id, ...s }))
-    .sort((a, b) => a.order - b.order);
-  const activeSession = activeSessionId && activeSessionId !== "ALL"
-    ? sessions.find((s) => s.id === activeSessionId)
-    : null;
-  const sessionDescription = activeSession?.description || room.description || "";
+  // 黄色ブロックに表示するテキスト：セッション名 or セッション案内テキスト
+  const sessionBannerTitle = activeSession?.title ?? (activeSessionId === "ALL" ? "全セッション受付中" : null);
+  const sessionBannerDesc = activeSession?.description ?? null;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
-      {/* Header */}
+      {/* Header: タイトルとイベント説明のみ */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-xl mx-auto px-4 py-3">
           <h1 className="font-bold text-gray-900 truncate">{room.title}</h1>
           {room.description && (
             <p className="text-xs text-gray-400 mt-0.5 truncate">{room.description}</p>
           )}
-          {activeSession && (
-            <p className="text-xs text-amber-600 font-medium mt-0.5 truncate">▶ {activeSession.title}</p>
-          )}
         </div>
       </div>
 
       <div className="max-w-xl mx-auto px-4 pt-4 space-y-4">
-        {/* 案内テキスト */}
-        {sessionDescription && (
-          <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 text-sm text-amber-700">
-            {sessionDescription}
+        {/* セッションバナー */}
+        {sessionBannerTitle && (
+          <div className="bg-indigo-50 border border-indigo-100 rounded-2xl px-4 py-3">
+            <p className="text-sm font-semibold text-indigo-700">▶ {sessionBannerTitle}</p>
+            {sessionBannerDesc && (
+              <p className="text-xs text-indigo-600 mt-1">{sessionBannerDesc}</p>
+            )}
           </div>
         )}
+
         {/* Submit form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          {activeSession && (
-            <div className="mb-3 pb-3 border-b border-gray-100">
-              <p className="text-xs text-gray-400">現在のセッション</p>
-              <p className="text-sm font-semibold text-amber-600">{activeSession.title}</p>
-            </div>
-          )}
           {showCompany && (
             <input
               type="text"
@@ -158,7 +173,7 @@ export default function Room() {
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder={`会社名${companyRequired ? "（必須）" : "（任意）"}`}
               maxLength={100}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 mb-2"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2"
               required={companyRequired}
             />
           )}
@@ -169,7 +184,7 @@ export default function Room() {
               onChange={(e) => setAuthorName(e.target.value)}
               placeholder={`お名前${nameRequired ? "（必須）" : "（任意）"}`}
               maxLength={50}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 mb-2"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2"
               required={nameRequired}
             />
           )}
@@ -179,7 +194,7 @@ export default function Room() {
             placeholder="質問を入力してください..."
             maxLength={500}
             rows={3}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
             required
           />
           <div className="flex items-center justify-between mt-2">
@@ -187,7 +202,7 @@ export default function Room() {
             <button
               type="submit"
               disabled={!canSubmit}
-              className="px-5 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? "送信中..." : "投稿する"}
             </button>
@@ -221,13 +236,13 @@ export default function Room() {
                   key={q.id}
                   className={`bg-white rounded-2xl border shadow-sm p-4 flex gap-3 ${
                     q.isAnswered ? "opacity-60" : ""
-                  } ${isPending ? "border-amber-200 bg-amber-50" : "border-gray-100"}`}
+                  } ${isPending ? "border-orange-200 bg-orange-50" : "border-gray-100"}`}
                 >
                   <button
                     onClick={() => !isPending && handleLike(q.id)}
                     disabled={isPending}
                     className={`flex flex-col items-center min-w-[40px] pt-1 transition-colors ${
-                      liked ? "text-amber-500" : "text-gray-300 hover:text-orange-300"
+                      liked ? "text-indigo-600" : "text-gray-300 hover:text-indigo-400"
                     } ${isPending ? "cursor-default" : "cursor-pointer"}`}
                   >
                     <span className="text-lg">▲</span>
@@ -235,12 +250,12 @@ export default function Room() {
                   </button>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 leading-relaxed">{q.text}</p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
                       {byLine && (
                         <span className="text-xs text-gray-400">{byLine}</span>
                       )}
                       {isPending && (
-                        <span className="text-xs text-amber-500 bg-orange-100 px-2 py-0.5 rounded-full">
+                        <span className="text-xs text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">
                           承認待ち
                         </span>
                       )}
@@ -259,9 +274,9 @@ export default function Room() {
                       <div className="mt-2 space-y-1.5">
                         {replies.map((r) => (
                           <div key={r.id} className={`text-xs rounded-xl px-3 py-2 ${
-                            r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-amber-50 border border-amber-100"
+                            r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-indigo-50 border border-indigo-100"
                           }`}>
-                            <span className="font-medium text-amber-600">登壇者より</span>
+                            <span className="font-medium text-indigo-700">登壇者より</span>
                             {r.isPrivate && <span className="text-yellow-600 ml-1">（あなただけに表示）</span>}
                             <p className="text-gray-700 mt-0.5">{r.text}</p>
                           </div>

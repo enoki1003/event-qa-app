@@ -19,26 +19,21 @@ export default function Home() {
 
     try {
       const snapshot = await get(ref(db, "rooms"));
-
       if (!snapshot.exists()) {
         setError("ルームが見つかりませんでした。コードを確認してください。");
         return;
       }
-
       const rooms = snapshot.val();
       const entry = Object.entries(rooms).find(([_, r]: any) => r.code === trimmed);
-
       if (!entry) {
         setError("ルームが見つかりませんでした。コードを確認してください。");
         return;
       }
-
       const room: any = entry[1];
       if (!room.isOpen) {
         setError("このルームは現在締め切られています。");
         return;
       }
-
       navigate(`/room/${trimmed}`);
     } catch {
       setError("エラーが発生しました。もう一度お試しください。");
@@ -48,7 +43,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">💬</div>
@@ -58,11 +53,11 @@ export default function Home() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
           {/* QRコード案内 */}
-          <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
             <span className="text-2xl">📷</span>
             <div>
-              <p className="text-sm font-medium text-orange-900">QRコードで参加</p>
-              <p className="text-xs text-amber-500 mt-0.5">
+              <p className="text-sm font-medium text-indigo-900">QRコードで参加</p>
+              <p className="text-xs text-indigo-600 mt-0.5">
                 スマホのカメラでQRコードを読み取るとそのまま入室できます
               </p>
             </div>
@@ -82,12 +77,15 @@ export default function Home() {
             <input
               type="text"
               value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              onChange={(e) => setCode(e.target.value.replace(/[^A-Z0-9]/gi, "").toUpperCase())}
               placeholder="例: ABC123"
               maxLength={8}
-              className="w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent uppercase"
-              autoFocus
+              className="w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
               autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              inputMode="text"
             />
             {error && (
               <p className="mt-2 text-sm text-red-500">{error}</p>
@@ -95,7 +93,7 @@ export default function Home() {
             <button
               type="submit"
               disabled={!code.trim() || loading}
-              className="mt-3 w-full py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 active:bg-orange-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="mt-3 w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 active:bg-indigo-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "確認中..." : "参加する"}
             </button>
