@@ -62,7 +62,7 @@ export default function Room() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
         <p className="text-red-500">{error || "ルームが見つかりません"}</p>
-        <button onClick={() => navigate("/")} className="text-amber-700 hover:underline text-sm">トップに戻る</button>
+        <button onClick={() => navigate("/")} className="text-rimo-600 hover:underline text-sm">トップに戻る</button>
       </div>
     );
   }
@@ -72,7 +72,7 @@ export default function Room() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
         <div className="text-4xl">🔒</div>
         <p className="text-gray-600 font-medium">このルームは現在締め切られています</p>
-        <button onClick={() => navigate("/")} className="text-amber-700 hover:underline text-sm">トップに戻る</button>
+        <button onClick={() => navigate("/")} className="text-rimo-600 hover:underline text-sm">トップに戻る</button>
       </div>
     );
   }
@@ -142,23 +142,26 @@ export default function Room() {
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-xl mx-auto px-4 py-3">
-          <h1 className="font-bold text-gray-900 truncate">{room.title}</h1>
-          {room.description && (
-            <p className="text-xs text-gray-400 mt-0.5 truncate">{room.description}</p>
-          )}
+        <div className="max-w-xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="font-bold text-gray-900 truncate">{room.title}</h1>
+            {room.description && (
+              <p className="text-xs text-gray-400 mt-0.5 truncate">{room.description}</p>
+            )}
+          </div>
+          <img src="/rimo_logo.svg" alt="Rimo" className="h-5 flex-shrink-0 opacity-70" />
         </div>
       </div>
 
       <div className="max-w-xl mx-auto px-4 pt-4 space-y-4">
         {/* セッションバナー */}
         {(sessionBannerTitle || sessionBannerDesc) && (
-          <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3">
+          <div className="bg-rimo-50 border border-rimo-100 rounded-2xl px-4 py-3">
             {sessionBannerTitle && (
-              <p className="text-sm font-semibold text-amber-800">▶ {sessionBannerTitle}</p>
+              <p className="text-sm font-semibold text-rimo-700">▶ {sessionBannerTitle}</p>
             )}
             {sessionBannerDesc && (
-              <p className="text-xs text-amber-700 mt-1">{sessionBannerDesc}</p>
+              <p className="text-xs text-rimo-600 mt-1">{sessionBannerDesc}</p>
             )}
           </div>
         )}
@@ -172,23 +175,23 @@ export default function Room() {
             {showCompany && (
               <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)}
                 placeholder={`会社名${companyRequired ? "（必須）" : "（任意）"}`} maxLength={100}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 mb-2"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 mb-2"
                 required={companyRequired} />
             )}
             {showName && (
               <input type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)}
                 placeholder={`お名前${nameRequired ? "（必須）" : "（任意）"}`} maxLength={50}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 mb-2"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 mb-2"
                 required={nameRequired} />
             )}
             <textarea value={text} onChange={(e) => setText(e.target.value)}
               placeholder="質問を入力してください..." maxLength={1000} rows={3}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 resize-none"
               required />
             <div className="flex items-center justify-between mt-2">
               <span className="text-xs text-gray-400">{text.length}/1000</span>
               <button type="submit" disabled={!canSubmit}
-                className="px-5 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                className="px-5 py-2 bg-rimo-500 text-white text-sm font-medium rounded-lg hover:bg-rimo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                 {submitting ? "送信中..." : "投稿する"}
               </button>
             </div>
@@ -210,7 +213,7 @@ export default function Room() {
             <div className="flex gap-1">
               {(["new", "old"] as const).map((o) => (
                 <button key={o} onClick={() => setSortOrder(o)}
-                  className={`px-2 py-1 text-xs rounded-lg transition-colors ${sortOrder === o ? "bg-amber-100 text-amber-800 font-medium" : "text-gray-400 hover:text-gray-600"}`}>
+                  className={`px-2 py-1 text-xs rounded-lg transition-colors ${sortOrder === o ? "bg-rimo-100 text-rimo-700 font-medium" : "text-gray-400 hover:text-gray-600"}`}>
                   {o === "new" ? "新しい順" : "古い順"}
                 </button>
               ))}
@@ -220,7 +223,7 @@ export default function Room() {
           {sorted.length === 0 ? (
             <div className="text-center py-10 text-gray-400 text-sm">まだ質問がありません</div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="px-4 pb-4 space-y-3">
               {sorted.map((q) => {
                 const isPending = q.status === "pending";
                 const byLine = [q.companyName, q.authorName].filter(Boolean).join(" / ");
@@ -231,12 +234,12 @@ export default function Room() {
                   .sort((a, b) => a.createdAt - b.createdAt);
 
                 return (
-                  <div key={q.id} className={`px-4 py-3 ${q.isAnswered ? "opacity-60" : ""} ${isPending ? "bg-gray-50" : ""}`}>
+                  <div key={q.id} className={`border rounded-xl p-3 ${q.isAnswered ? "opacity-60" : ""} ${isPending ? "bg-gray-50 border-gray-200" : "bg-white border-gray-200"}`}>
                     <p className="text-sm text-gray-800 leading-relaxed">{q.text}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-1.5">
                       {byLine && <span className="text-xs text-gray-400">{byLine}</span>}
                       {isPending && (
-                        <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">承認待ち</span>
+                        <span className="text-xs text-rimo-600 bg-rimo-100 px-2 py-0.5 rounded-full">承認待ち</span>
                       )}
                       {q.isAnswered && (
                         <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">回答済み</span>
@@ -250,10 +253,10 @@ export default function Room() {
                     {replies.length > 0 && (
                       <div className="mt-2 space-y-1.5">
                         {replies.map((r) => (
-                          <div key={r.id} className={`text-xs rounded-xl px-3 py-2 flex gap-2 ${r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-amber-50 border border-amber-100"}`}>
+                          <div key={r.id} className={`text-xs rounded-xl px-3 py-2 flex gap-2 ${r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-rimo-50 border border-rimo-100"}`}>
                             <span className="text-gray-400 flex-shrink-0">↪</span>
                             <div>
-                              <span className="font-medium text-amber-800">{replyLabel}</span>
+                              <span className="font-medium text-rimo-700">{replyLabel}</span>
                               {r.isPrivate && <span className="text-yellow-600 ml-1">（あなただけに表示）</span>}
                               <p className="text-gray-700 mt-0.5">{r.text}</p>
                             </div>

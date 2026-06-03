@@ -260,7 +260,7 @@ export default function HostRoom() {
             </button>
             <button
               onClick={() => navigate(`/host/room/${roomId}/report`)}
-              className="px-2.5 py-1.5 border border-amber-200 text-amber-700 text-xs rounded-lg hover:bg-amber-50 font-medium"
+              className="px-2.5 py-1.5 border border-rimo-200 text-rimo-600 text-xs rounded-lg hover:bg-rimo-50 font-medium"
             >
               レポート
             </button>
@@ -273,8 +273,8 @@ export default function HostRoom() {
             !activeSessionId
               ? "bg-gray-100 text-gray-500"
               : activeSessionId === "ALL"
-              ? "bg-amber-50 text-amber-700"
-              : "bg-amber-50 text-amber-700"
+              ? "bg-rimo-50 text-rimo-600"
+              : "bg-rimo-50 text-rimo-600"
           }`}
         >
           {currentLabel}
@@ -288,7 +288,7 @@ export default function HostRoom() {
               onClick={() => setTab(t)}
               className={`py-2 text-sm font-medium border-b-2 transition-colors ${
                 tab === t
-                  ? "border-amber-500 text-amber-700"
+                  ? "border-rimo-500 text-rimo-600"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
@@ -316,7 +316,7 @@ export default function HostRoom() {
             <div className="flex gap-3">
               <button
                 onClick={downloadQr}
-                className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600"
+                className="px-4 py-2 bg-rimo-500 text-white text-sm font-medium rounded-lg hover:bg-rimo-600"
               >
                 QR画像を保存
               </button>
@@ -379,7 +379,7 @@ export default function HostRoom() {
                 <p className="text-sm font-medium text-gray-700">セッション一覧</p>
                 <button
                   onClick={() => setShowSessionForm(true)}
-                  className="text-xs text-amber-600 hover:underline"
+                  className="text-xs text-rimo-600 hover:underline"
                 >
                   ＋ セッション追加
                 </button>
@@ -392,7 +392,7 @@ export default function HostRoom() {
                     value={newSessionTitle}
                     onChange={(e) => setNewSessionTitle(e.target.value)}
                     placeholder="セッション名（例: 第1部 Q&A）"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 bg-white"
                     autoFocus
                     required
                   />
@@ -401,13 +401,13 @@ export default function HostRoom() {
                     value={newSessionDescription}
                     onChange={(e) => setNewSessionDescription(e.target.value)}
                     placeholder="参加者への案内テキスト（任意）例: ご質問はこちらへどうぞ！"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 bg-white"
                   />
                   <div className="flex gap-2">
                     <button
                       type="submit"
                       disabled={addingSession}
-                      className="px-3 py-2 bg-amber-500 text-white text-xs rounded-lg hover:bg-amber-600 disabled:opacity-40"
+                      className="px-3 py-2 bg-rimo-500 text-white text-xs rounded-lg hover:bg-rimo-600 disabled:opacity-40"
                     >
                       追加
                     </button>
@@ -439,7 +439,7 @@ export default function HostRoom() {
                       <div
                         key={session.id}
                         className={`p-3 rounded-xl border transition-colors ${
-                          isActive ? "bg-amber-50 border-amber-200" : "bg-gray-50 border-gray-100"
+                          isActive ? "bg-rimo-50 border-rimo-200" : "bg-gray-50 border-gray-100"
                         }`}
                       >
                         {isEditing ? (
@@ -450,7 +450,7 @@ export default function HostRoom() {
                               value={editSessionTitle}
                               onChange={(e) => setEditSessionTitle(e.target.value)}
                               placeholder="セッション名"
-                              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
+                              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 bg-white"
                               autoFocus
                               required
                             />
@@ -459,14 +459,14 @@ export default function HostRoom() {
                               value={editSessionDescription}
                               onChange={(e) => setEditSessionDescription(e.target.value)}
                               placeholder="参加者への案内テキスト（任意）"
-                              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
+                              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 bg-white"
                             />
                             <div className="flex gap-2">
                               <button
                                 type="button"
                                 onClick={() => handleSaveSessionEdit(session.id)}
                                 disabled={!editSessionTitle.trim() || savingSessionEdit}
-                                className="px-3 py-1.5 bg-amber-500 text-white text-xs rounded-lg hover:bg-amber-600 disabled:opacity-40"
+                                className="px-3 py-1.5 bg-rimo-500 text-white text-xs rounded-lg hover:bg-rimo-600 disabled:opacity-40"
                               >
                                 {savingSessionEdit ? "保存中..." : "保存"}
                               </button>
@@ -491,7 +491,7 @@ export default function HostRoom() {
                               <p className="text-xs text-gray-400">{sessionQCount}件の質問</p>
                             </div>
                             {isActive && (
-                              <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full flex-shrink-0">
+                              <span className="text-xs bg-rimo-500 text-white px-2 py-0.5 rounded-full flex-shrink-0">
                                 受付中
                               </span>
                             )}
@@ -505,7 +505,7 @@ export default function HostRoom() {
                               {!isActive && (
                                 <button
                                   onClick={() => handleStartSession(session.id)}
-                                  className="px-2 py-1 bg-amber-500 text-white text-xs rounded-lg hover:bg-amber-600"
+                                  className="px-2 py-1 bg-rimo-500 text-white text-xs rounded-lg hover:bg-rimo-600"
                                 >
                                   開始
                                 </button>
@@ -552,12 +552,12 @@ export default function HostRoom() {
                   onClick={() => setSessionFilter("all")}
                   className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
                     sessionFilter === "all"
-                      ? "border-amber-500 text-amber-700 bg-amber-50/50"
+                      ? "border-rimo-500 text-rimo-600 bg-rimo-50/50"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                   }`}
                 >
                   全ての質問
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === "all" ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-500"}`}>
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === "all" ? "bg-rimo-100 text-rimo-700" : "bg-gray-100 text-gray-500"}`}>
                     {questions.length}
                   </span>
                 </button>
@@ -570,12 +570,12 @@ export default function HostRoom() {
                       onClick={() => setSessionFilter(s.id)}
                       className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
                         sessionFilter === s.id
-                          ? "border-amber-500 text-amber-700 bg-amber-50/50"
+                          ? "border-rimo-500 text-rimo-600 bg-rimo-50/50"
                           : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                       }`}
                     >
                       {s.title}
-                      <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === s.id ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-500"}`}>
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === s.id ? "bg-rimo-100 text-rimo-700" : "bg-gray-100 text-gray-500"}`}>
                         {count}
                       </span>
                     </button>
@@ -587,12 +587,12 @@ export default function HostRoom() {
                     onClick={() => setSessionFilter("none")}
                     className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
                       sessionFilter === "none"
-                        ? "border-amber-500 text-amber-700 bg-amber-50/50"
+                        ? "border-rimo-500 text-rimo-600 bg-rimo-50/50"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     未分類
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === "none" ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-500"}`}>
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === "none" ? "bg-rimo-100 text-rimo-700" : "bg-gray-100 text-gray-500"}`}>
                       {questions.filter((q) => !q.sessionId).length}
                     </span>
                   </button>
@@ -607,7 +607,7 @@ export default function HostRoom() {
                     onClick={() => setQFilter(f.key)}
                     className={`flex-shrink-0 px-3 py-1 text-xs rounded-full font-medium transition-colors ${
                       qFilter === f.key
-                        ? "bg-amber-500 text-white"
+                        ? "bg-rimo-500 text-white"
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                   >
@@ -691,7 +691,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
         </span>
       );
     return (
-      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+      <span className="text-xs bg-rimo-100 text-rimo-600 px-2 py-0.5 rounded-full">
         承認待ち
       </span>
     );
@@ -735,7 +735,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
               className={`text-xs rounded-xl px-3 py-2 ${
                 r.isPrivate
                   ? "bg-yellow-50 border border-yellow-100"
-                  : "bg-amber-50 border border-amber-100"
+                  : "bg-rimo-50 border border-rimo-100"
               }`}
             >
               <div className="flex items-center gap-1 mb-0.5">
@@ -769,7 +769,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
         {q.status === "approved" && (
           <button
             onClick={() => pendingQuestion(roomId, q.id)}
-            className="px-3 py-1.5 border border-amber-200 text-amber-600 text-xs rounded-lg hover:bg-amber-50"
+            className="px-3 py-1.5 border border-rimo-200 text-rimo-600 text-xs rounded-lg hover:bg-rimo-50"
           >
             承認を戻す
           </button>
@@ -777,7 +777,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
         {q.status === "rejected" && (
           <button
             onClick={() => pendingQuestion(roomId, q.id)}
-            className="px-3 py-1.5 border border-amber-200 text-amber-600 text-xs rounded-lg hover:bg-amber-50"
+            className="px-3 py-1.5 border border-rimo-200 text-rimo-600 text-xs rounded-lg hover:bg-rimo-50"
           >
             承認を戻す
           </button>
@@ -802,7 +802,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
         </button>
         <button
           onClick={() => setShowReplyForm((v) => !v)}
-          className="px-3 py-1.5 border border-amber-200 text-amber-600 text-xs rounded-lg hover:bg-amber-50"
+          className="px-3 py-1.5 border border-rimo-200 text-rimo-600 text-xs rounded-lg hover:bg-rimo-50"
         >
           返信する
         </button>
@@ -816,7 +816,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
             onChange={(e) => setReplyText(e.target.value)}
             placeholder="返信内容を入力..."
             rows={2}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 resize-none"
             required
             autoFocus
           />
@@ -826,7 +826,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
                 type="checkbox"
                 checked={!isPrivate}
                 onChange={(e) => setIsPrivate(!e.target.checked)}
-                className="w-3.5 h-3.5 accent-amber-500"
+                className="w-3.5 h-3.5 accent-rimo-500"
               />
               全体にも公開する
             </label>
@@ -841,7 +841,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
               <button
                 type="submit"
                 disabled={!replyText.trim() || sendingReply}
-                className="px-3 py-1.5 bg-amber-500 text-white text-xs rounded-lg hover:bg-amber-600 disabled:opacity-40"
+                className="px-3 py-1.5 bg-rimo-500 text-white text-xs rounded-lg hover:bg-rimo-600 disabled:opacity-40"
               >
                 {sendingReply ? "送信中..." : isPrivate ? "送信（投稿者のみ）" : "送信（全体に公開）"}
               </button>
@@ -903,7 +903,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
           required
         />
       </div>
@@ -914,7 +914,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
-          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none text-sm"
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 resize-none text-sm"
         />
       </div>
 
@@ -925,7 +925,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
             type="date"
             value={eventDate}
             onChange={(e) => setEventDate(e.target.value)}
-            className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
+            className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
           />
         </div>
         <div>
@@ -934,7 +934,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
             type="time"
             value={eventTime}
             onChange={(e) => setEventTime(e.target.value)}
-            className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
+            className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
           />
         </div>
       </div>
@@ -944,7 +944,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
         <select
           value={settings.authorMode}
           onChange={(e) => upd({ authorMode: e.target.value as AuthorMode })}
-          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
         >
           {AUTHOR_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
@@ -961,7 +961,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
           value={settings.replyAuthorLabel}
           onChange={(e) => upd({ replyAuthorLabel: e.target.value })}
           placeholder="運営"
-          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
         />
       </div>
 
@@ -971,7 +971,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
             type="checkbox"
             checked={settings.requireApproval}
             onChange={(e) => upd({ requireApproval: e.target.checked })}
-            className="w-4 h-4 accent-amber-500"
+            className="w-4 h-4 accent-rimo-500"
           />
           承認制にする（承認後に参加者画面に表示）
         </label>
@@ -980,7 +980,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
             type="checkbox"
             checked={settings.showTimestamp}
             onChange={(e) => upd({ showTimestamp: e.target.checked })}
-            className="w-4 h-4 accent-amber-500"
+            className="w-4 h-4 accent-rimo-500"
           />
           投稿日時を表示する
         </label>
@@ -993,7 +993,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
           value={settings.slackWebhookUrl}
           onChange={(e) => upd({ slackWebhookUrl: e.target.value })}
           placeholder="https://hooks.slack.com/services/..."
-          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
         />
       </div>
 
@@ -1001,7 +1001,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 disabled:opacity-40"
+          className="px-4 py-2 bg-rimo-500 text-white text-sm font-medium rounded-lg hover:bg-rimo-600 disabled:opacity-40"
         >
           {saving ? "保存中..." : "保存"}
         </button>

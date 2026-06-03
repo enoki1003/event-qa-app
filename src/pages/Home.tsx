@@ -33,15 +33,18 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-rimo-50 to-amber-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
+        <div className="flex justify-center mb-8">
+          <img src="/rimo_logo.svg" alt="Rimo" className="h-7" />
+        </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-rimo-50 rounded-xl">
             <span className="text-2xl">📷</span>
             <div>
-              <p className="text-sm font-medium text-amber-900">QRコードで参加</p>
-              <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
+              <p className="text-sm font-medium text-rimo-800">QRコードで参加</p>
+              <p className="text-xs text-rimo-600 mt-0.5 leading-relaxed">
                 イベント内で案内中のQRコードを<br />
                 スマホのカメラで読み取っていただくと<br />
                 そのまま入室できます
@@ -63,7 +66,7 @@ export default function Home() {
               onChange={(e) => setCode(e.target.value.replace(/[^A-Z0-9]/gi, "").toUpperCase())}
               placeholder="例: ABC123"
               maxLength={8}
-              className="w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent"
+              className="w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rimo-300 focus:border-transparent"
               autoComplete="off"
               autoCorrect="off"
               autoCapitalize="characters"
@@ -74,7 +77,7 @@ export default function Home() {
             <button
               type="submit"
               disabled={!code.trim() || loading}
-              className="mt-3 w-full py-3 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 active:bg-amber-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="mt-3 w-full py-3 bg-rimo-500 text-white font-semibold rounded-xl hover:bg-rimo-600 active:bg-rimo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "確認中..." : "参加する"}
             </button>

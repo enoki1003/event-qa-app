@@ -125,7 +125,7 @@ export default function HostReport() {
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
                       <div
-                        className="bg-amber-500 h-2 rounded-full transition-all duration-500"
+                        className="bg-rimo-500 h-2 rounded-full transition-all duration-500"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -191,7 +191,7 @@ export default function HostReport() {
                       </p>
                     </div>
                     <div className="col-span-2">
-                      <span className={`text-xs font-medium ${qCount > 0 ? "text-amber-700" : "text-gray-300"}`}>
+                      <span className={`text-xs font-medium ${qCount > 0 ? "text-rimo-600" : "text-gray-300"}`}>
                         {qCount > 0 ? `${qCount}件` : "—"}
                       </span>
                     </div>

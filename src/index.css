@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+@theme {
+  --color-rimo-50: #fff5f0;
+  --color-rimo-100: #ffe0d0;
+  --color-rimo-200: #ffc0a0;
+  --color-rimo-300: #f18900;
+  --color-rimo-400: #f18900;
+  --color-rimo-500: #F14C00;
+  --color-rimo-600: #d43d00;
+  --color-rimo-700: #b83200;
+  --color-rimo-800: #8a2500;
+  --color-rimo-900: #5c1800;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -7,8 +20,9 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
-  background: #f8fafc;
+  background: #ffffff;
   -webkit-font-smoothing: antialiased;
+  color: #1a1a1a;
 }
 
 #root {
