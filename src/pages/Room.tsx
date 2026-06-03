@@ -113,12 +113,12 @@ export default function Room() {
   };
 
   const activeSessionId = room.activeSessionId ?? null;
-  const activeSession = activeSessionId && activeSessionId !== "ALL"
-    ? sessions.find((s) => s.id === activeSessionId)
-    : null;
   const sessions = Object.entries(room.sessions || {})
     .map(([id, s]) => ({ id, ...s }))
     .sort((a, b) => a.order - b.order);
+  const activeSession = activeSessionId && activeSessionId !== "ALL"
+    ? sessions.find((s) => s.id === activeSessionId)
+    : null;
   const sessionDescription = activeSession?.description || room.description || "";
 
   return (
