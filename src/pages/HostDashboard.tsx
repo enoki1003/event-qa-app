@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import { isHostAuth } from "./HostLogin";
-import { useRooms, createRoom, updateRoomSettings, toggleRoomOpen, deleteRoom } from "../hooks/useRooms";
-import type { AuthorMode, Room, RoomSettings } from "../types";
+import { useRooms, createRoom, deleteRoom } from "../hooks/useRooms";
+import type { AuthorMode, RoomSettings } from "../types";
 
 const AUTHOR_OPTIONS: { value: AuthorMode; label: string }[] = [
   { value: "anonymous", label: "匿名" },
@@ -18,8 +18,6 @@ const DEFAULT_SETTINGS: RoomSettings = {
   requireApproval: false,
   showTimestamp: false,
 };
-
-type ModalMode = "create" | "edit";
 
 interface RoomFormState {
   title: string;
@@ -36,7 +34,7 @@ const EMPTY_FORM: RoomFormState = {
 export default function HostDashboard() {
   const navigate = useNavigate();
   const { rooms, loading } = useRooms();
-  const [modal, setModal] = useState<{ mode: ModalMode; room?: Room } | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
   const [qrTarget, setQrTarget] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<RoomFormState>(EMPTY_FORM);
@@ -47,16 +45,7 @@ export default function HostDashboard() {
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
-    setModal({ mode: "create" });
-  };
-
-  const openEdit = (room: Room) => {
-    setForm({
-      title: room.title,
-      description: room.description || "",
-      settings: { ...DEFAULT_SETTINGS, ...room.settings },
-    });
-    setModal({ mode: "edit", room });
+    setShowCreate(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -64,14 +53,9 @@ export default function HostDashboard() {
     if (!form.title.trim() || saving) return;
     setSaving(true);
     try {
-      if (modal?.mode === "create") {
-        const id = await createRoom(form.title, form.description, form.settings);
-        setModal(null);
-        navigate(`/host/room/${id}`);
-      } else if (modal?.mode === "edit" && modal.room) {
-        await updateRoomSettings(modal.room.id, form.title, form.description, form.settings);
-        setModal(null);
-      }
+      const id = await createRoom(form.title, form.description, form.settings);
+      setShowCreate(false);
+      navigate(`/host/room/${id}`);
     } finally {
       setSaving(false);
     }
@@ -98,11 +82,11 @@ export default function HostDashboard() {
         </div>
 
         {/* Create / Edit modal */}
-        {modal && (
+        {showCreate && (
           <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
               <h2 className="font-bold text-gray-900 mb-4">
-                {modal.mode === "create" ? "新規イベント作成" : "イベント設定を編集"}
+                新規イベント作成
               </h2>
               <form onSubmit={handleSave} className="space-y-4">
                 <div>
@@ -176,7 +160,7 @@ export default function HostDashboard() {
                 <div className="flex gap-2 pt-2">
                   <button
                     type="button"
-                    onClick={() => setModal(null)}
+                    onClick={() => setShowCreate(false)}
                     className="flex-1 py-2 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 text-sm"
                   >
                     キャンセル
@@ -186,7 +170,7 @@ export default function HostDashboard() {
                     disabled={!form.title.trim() || saving}
                     className="flex-1 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-40 text-sm font-medium"
                   >
-                    {saving ? "保存中..." : modal.mode === "create" ? "作成" : "保存"}
+                    {saving ? "保存中..." : "作成"}
                   </button>
                 </div>
               </form>

@@ -68,7 +68,6 @@ export default function HostRoom() {
   const [newSessionDescription, setNewSessionDescription] = useState("");
   const [addingSession, setAddingSession] = useState(false);
   const [tab, setTab] = useState<"questions" | "sessions" | "settings">("questions");
-  const [savingSettings, setSavingSettings] = useState(false);
 
   useEffect(() => {
     if (!isHostAuth()) navigate("/host");
