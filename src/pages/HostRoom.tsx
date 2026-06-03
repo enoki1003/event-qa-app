@@ -47,14 +47,13 @@ async function notifySlack(webhookUrl: string, question: Question, roomTitle: st
 
 function exportCsv(questions: Question[], roomTitle: string) {
   const rows = [
-    ["ID", "セッション", "質問", "会社名", "投稿者", "いいね数", "ステータス", "回答済み", "投稿日時"],
+    ["ID", "セッション", "質問", "会社名", "投稿者", "ステータス", "回答済み", "投稿日時"],
     ...questions.map((q) => [
       q.id,
       q.sessionTitle || "（セッションなし）",
       `"${q.text.replace(/"/g, '""')}"`,
       q.companyName || "",
       q.authorName || "匿名",
-      q.likes,
       q.status === "approved" ? "承認" : q.status === "rejected" ? "却下" : "承認待ち",
       q.isAnswered ? "済" : "未",
       new Date(q.createdAt).toLocaleString("ja-JP"),
@@ -683,13 +682,8 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
         q.status === "pending" ? "border-gray-200" : "border-gray-100"
       }`}
     >
-      <div className="flex items-start gap-3">
-        <div className="flex flex-col items-center min-w-[36px] text-gray-400">
-          <span className="text-lg">▲</span>
-          <span className="text-xs font-bold text-gray-600">{q.likes}</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-800 leading-relaxed">{q.text}</p>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-gray-800 leading-relaxed">{q.text}</p>
           <div className="flex flex-wrap items-center gap-2 mt-1.5">
             {byLine && <span className="text-xs text-gray-400">{byLine}</span>}
             {q.sessionTitle && (
@@ -710,7 +704,6 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
             )}
           </div>
         </div>
-      </div>
 
       {/* 返信一覧 */}
       {replies.length > 0 && (
