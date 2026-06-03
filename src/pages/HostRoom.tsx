@@ -5,7 +5,7 @@ import { isHostAuth } from "./HostLogin";
 import { useRoomById } from "../hooks/useRoom";
 import { useQuestions, approveQuestion, rejectQuestion, markAnswered, toggleHidden, addReply } from "../hooks/useQuestions";
 import { toggleRoomOpen, addSession, setActiveSession, deleteSession } from "../hooks/useRooms";
-import type { Question, QuestionStatus, Session } from "../types";
+import type { Question, Session } from "../types";
 
 type QFilter = "all" | "pending" | "approved" | "answered";
 
