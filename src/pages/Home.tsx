@@ -44,7 +44,11 @@ export default function Home() {
             <span className="text-2xl">📷</span>
             <div>
               <p className="text-sm font-medium text-amber-900">QRコードで参加</p>
-              <p className="text-xs text-amber-700 mt-0.5">イベント内で案内中のQRコードをスマホのカメラで読み取っていただくとそのまま入室できます</p>
+              <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
+                イベント内で案内中のQRコードを<br />
+                スマホのカメラで読み取っていただくと<br />
+                そのまま入室できます
+              </p>
             </div>
           </div>
 
