@@ -518,77 +518,97 @@ export default function HostRoom() {
         {/* ---- 質問タブ ---- */}
         {tab === "questions" && (
           <div className="space-y-3">
-            {/* セッション絞り込みチップ */}
-            {sessions.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
+            {/* セッションタブ */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="flex overflow-x-auto border-b border-gray-100">
+                {/* 全ての質問 */}
                 <button
                   onClick={() => setSessionFilter("all")}
-                  className={`flex-shrink-0 px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
+                  className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
                     sessionFilter === "all"
-                      ? "bg-gray-700 text-white"
-                      : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                      ? "border-indigo-600 text-indigo-600 bg-indigo-50/50"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                   }`}
                 >
-                  全セッション
+                  全ての質問
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === "all" ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-500"}`}>
+                    {questions.length}
+                  </span>
                 </button>
-                {sessions.map((s) => (
+                {/* 各セッション */}
+                {sessions.map((s) => {
+                  const count = questions.filter((q) => q.sessionId === s.id).length;
+                  return (
+                    <button
+                      key={s.id}
+                      onClick={() => setSessionFilter(s.id)}
+                      className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                        sessionFilter === s.id
+                          ? "border-indigo-600 text-indigo-600 bg-indigo-50/50"
+                          : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {s.title}
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === s.id ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-500"}`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+                {/* 未分類（セッションがある場合のみ） */}
+                {sessions.length > 0 && (
                   <button
-                    key={s.id}
-                    onClick={() => setSessionFilter(s.id)}
-                    className={`flex-shrink-0 px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
-                      sessionFilter === s.id
-                        ? "bg-gray-700 text-white"
-                        : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    onClick={() => setSessionFilter("none")}
+                    className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                      sessionFilter === "none"
+                        ? "border-indigo-600 text-indigo-600 bg-indigo-50/50"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                     }`}
                   >
-                    {s.title}
+                    未分類
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${sessionFilter === "none" ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-500"}`}>
+                      {questions.filter((q) => !q.sessionId).length}
+                    </span>
+                  </button>
+                )}
+              </div>
+
+              {/* ステータスフィルタ（タブの内側） */}
+              <div className="flex gap-2 px-4 py-2.5 overflow-x-auto border-b border-gray-50">
+                {Q_FILTERS.map((f) => (
+                  <button
+                    key={f.key}
+                    onClick={() => setQFilter(f.key)}
+                    className={`flex-shrink-0 px-3 py-1 text-xs rounded-full font-medium transition-colors ${
+                      qFilter === f.key
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {f.label}
                   </button>
                 ))}
-                <button
-                  onClick={() => setSessionFilter("none")}
-                  className={`flex-shrink-0 px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
-                    sessionFilter === "none"
-                      ? "bg-gray-700 text-white"
-                      : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  未分類
-                </button>
               </div>
-            )}
 
-            {/* ステータスフィルタチップ */}
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {Q_FILTERS.map((f) => (
-                <button
-                  key={f.key}
-                  onClick={() => setQFilter(f.key)}
-                  className={`flex-shrink-0 px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
-                    qFilter === f.key
-                      ? "bg-indigo-600 text-white"
-                      : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
+              {/* 質問カード一覧 */}
+              {filtered.length === 0 ? (
+                <div className="text-center py-12 text-gray-400 text-sm">質問がありません</div>
+              ) : (
+                <div className="divide-y divide-gray-50">
+                  {filtered.map((q) => (
+                    <QuestionCard
+                      key={q.id}
+                      q={q}
+                      roomId={room.id}
+                      slackWebhookUrl={room.settings.slackWebhookUrl}
+                      roomTitle={room.title}
+                      replyLabel={room.settings.replyAuthorLabel || "登壇者"}
+                      onApprove={handleApprove}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-
-            {/* 質問カード一覧 */}
-            {filtered.length === 0 ? (
-              <div className="text-center py-12 text-gray-400 text-sm">質問がありません</div>
-            ) : (
-              filtered.map((q) => (
-                <QuestionCard
-                  key={q.id}
-                  q={q}
-                  roomId={room.id}
-                  slackWebhookUrl={room.settings.slackWebhookUrl}
-                  roomTitle={room.title}
-                  onApprove={handleApprove}
-                />
-              ))
-            )}
           </div>
         )}
       </div>
@@ -603,10 +623,11 @@ interface QuestionCardProps {
   roomId: string;
   roomTitle: string;
   slackWebhookUrl: string;
+  replyLabel: string;
   onApprove: (q: Question) => void;
 }
 
-function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
+function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [isPrivate, setIsPrivate] = useState(true);
@@ -698,7 +719,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
               }`}
             >
               <div className="flex items-center gap-1 mb-0.5">
-                <span className="font-medium text-gray-600">返信</span>
+                <span className="font-medium text-gray-600">{replyLabel}</span>
                 {r.isPrivate && <span className="text-yellow-600">（投稿者のみ）</span>}
               </div>
               <p className="text-gray-700">{r.text}</p>
