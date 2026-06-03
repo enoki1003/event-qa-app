@@ -111,7 +111,7 @@ export default function HostDashboard() {
                     type="text"
                     value={form.title}
                     onChange={(e) => updateForm({ title: e.target.value })}
-                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
                     required
                   />
                 </div>
@@ -121,7 +121,7 @@ export default function HostDashboard() {
                     value={form.description}
                     onChange={(e) => updateForm({ description: e.target.value })}
                     rows={2}
-                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
                   />
                 </div>
                 <div>
@@ -129,7 +129,7 @@ export default function HostDashboard() {
                   <select
                     value={form.settings.authorMode}
                     onChange={(e) => updateSettings({ authorMode: e.target.value as AuthorMode })}
-                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
                   >
                     {AUTHOR_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>{o.label}</option>
@@ -169,7 +169,7 @@ export default function HostDashboard() {
                     value={form.settings.slackWebhookUrl}
                     onChange={(e) => updateSettings({ slackWebhookUrl: e.target.value })}
                     placeholder="https://hooks.slack.com/services/..."
-                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm"
                   />
                   <p className="text-xs text-gray-400 mt-1">承認した質問をリアルタイムでSlackに投稿します</p>
                 </div>

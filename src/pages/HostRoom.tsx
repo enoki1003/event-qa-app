@@ -195,7 +195,7 @@ export default function HostRoom() {
         <div className={`px-4 py-1.5 text-xs font-medium text-center ${
           !activeSessionId ? "bg-gray-100 text-gray-500"
           : activeSessionId === "ALL" ? "bg-blue-50 text-blue-700"
-          : "bg-orange-50 text-orange-600"
+          : "bg-amber-50 text-amber-600"
         }`}>
           {currentLabel}
         </div>
@@ -207,7 +207,7 @@ export default function HostRoom() {
               key={t}
               onClick={() => setTab(t)}
               className={`py-2 text-sm font-medium border-b-2 transition-colors ${
-                tab === t ? "border-orange-500 text-orange-500" : "border-transparent text-gray-500 hover:text-gray-700"
+                tab === t ? "border-orange-500 text-amber-500" : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
               {t === "questions" ? "質問" : "セッション"}
@@ -222,7 +222,7 @@ export default function HostRoom() {
           <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
             <QRCodeSVG value={roomUrl} size={240} />
             <p className="text-sm text-gray-500 font-mono text-center break-all max-w-xs">{roomUrl}</p>
-            <button onClick={() => navigator.clipboard.writeText(roomUrl)} className="text-sm text-orange-500 hover:underline">URLをコピー</button>
+            <button onClick={() => navigator.clipboard.writeText(roomUrl)} className="text-sm text-amber-500 hover:underline">URLをコピー</button>
             <button onClick={() => setShowQr(false)} className="text-sm text-gray-400 hover:text-gray-600">閉じる</button>
           </div>
         </div>
@@ -265,7 +265,7 @@ export default function HostRoom() {
                 <p className="text-sm font-medium text-gray-700">セッション一覧</p>
                 <button
                   onClick={() => setShowSessionForm(true)}
-                  className="text-xs text-orange-500 hover:underline"
+                  className="text-xs text-amber-500 hover:underline"
                 >
                   ＋ セッション追加
                 </button>
@@ -278,7 +278,7 @@ export default function HostRoom() {
                     value={newSessionTitle}
                     onChange={(e) => setNewSessionTitle(e.target.value)}
                     placeholder="セッション名（例: 第1部 Q&A）"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
                     autoFocus
                     required
                   />
@@ -287,7 +287,7 @@ export default function HostRoom() {
                     value={newSessionDescription}
                     onChange={(e) => setNewSessionDescription(e.target.value)}
                     placeholder="参加者への案内テキスト（任意）例: ご質問はこちらへどうぞ！"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
                   />
                   <div className="flex gap-2">
                     <button
@@ -319,7 +319,7 @@ export default function HostRoom() {
                       <div
                         key={session.id}
                         className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                          isActive ? "bg-orange-50 border-orange-200" : "bg-gray-50 border-gray-100"
+                          isActive ? "bg-amber-50 border-amber-200" : "bg-gray-50 border-gray-100"
                         }`}
                       >
                         <span className="text-xs text-gray-400 w-5 text-center">{i + 1}</span>
@@ -478,12 +478,12 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
   const statusBadge = (status: Question["status"]) => {
     if (status === "approved") return <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">承認済み</span>;
     if (status === "rejected") return <span className="text-xs bg-red-100 text-red-500 px-2 py-0.5 rounded-full">却下</span>;
-    return <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">承認待ち</span>;
+    return <span className="text-xs bg-orange-100 text-amber-600 px-2 py-0.5 rounded-full">承認待ち</span>;
   };
 
   return (
     <div className={`bg-white rounded-2xl border shadow-sm p-4 ${q.isHidden ? "opacity-50" : ""} ${
-      q.status === "pending" ? "border-orange-200" : "border-gray-100"
+      q.status === "pending" ? "border-amber-200" : "border-gray-100"
     }`}>
       <div className="flex items-start gap-3">
         <div className="flex flex-col items-center min-w-[36px] text-gray-400">
@@ -513,7 +513,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
         <div className="mt-3 ml-10 space-y-2">
           {replies.map((r) => (
             <div key={r.id} className={`text-xs rounded-xl px-3 py-2 ${
-              r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-orange-50 border border-orange-100"
+              r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-amber-50 border border-amber-100"
             }`}>
               <div className="flex items-center gap-1 mb-0.5">
                 <span className="font-medium text-gray-600">返信</span>
@@ -557,7 +557,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
         </button>
         <button
           onClick={() => setShowReplyForm((v) => !v)}
-          className="px-3 py-1.5 border border-orange-200 text-orange-500 text-xs rounded-lg hover:bg-orange-50"
+          className="px-3 py-1.5 border border-amber-200 text-amber-500 text-xs rounded-lg hover:bg-amber-50"
         >
           返信する
         </button>
@@ -571,7 +571,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
             onChange={(e) => setReplyText(e.target.value)}
             placeholder="返信内容を入力..."
             rows={2}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
             required
             autoFocus
           />

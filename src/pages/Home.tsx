@@ -48,7 +48,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">💬</div>
@@ -58,11 +58,11 @@ export default function Home() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
           {/* QRコード案内 */}
-          <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-xl">
             <span className="text-2xl">📷</span>
             <div>
               <p className="text-sm font-medium text-orange-900">QRコードで参加</p>
-              <p className="text-xs text-orange-500 mt-0.5">
+              <p className="text-xs text-amber-500 mt-0.5">
                 スマホのカメラでQRコードを読み取るとそのまま入室できます
               </p>
             </div>
@@ -85,7 +85,7 @@ export default function Home() {
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="例: ABC123"
               maxLength={8}
-              className="w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent uppercase"
+              className="w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent uppercase"
               autoFocus
               autoComplete="off"
             />
