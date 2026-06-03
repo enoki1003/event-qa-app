@@ -62,3 +62,10 @@ export interface Question {
 }
 
 export type QuestionInput = Pick<Question, "text" | "companyName" | "authorName">;
+
+export interface Visitor {
+  sessionId: string;
+  firstAccessAt: number;
+  companyName: string | null;
+  authorName: string | null;
+}

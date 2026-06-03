@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useRoomByCode } from "../hooks/useRoom";
 import { useQuestions, submitQuestion } from "../hooks/useQuestions";
 import { useSession } from "../hooks/useSession";
+import { recordVisit, updateVisitorInfo } from "../hooks/useVisitors";
 import type { AuthorMode } from "../types";
 
 const STORAGE_KEY = "qa_author_info";
@@ -47,6 +48,11 @@ export default function Room() {
   useEffect(() => {
     saveAuthorInfo(companyName, authorName);
   }, [companyName, authorName]);
+
+  // 入室記録（roomIdが確定したら一度だけ）
+  useEffect(() => {
+    if (room?.id) recordVisit(room.id, sessionId);
+  }, [room?.id, sessionId]);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="text-gray-400">読み込み中...</div></div>;
@@ -114,6 +120,13 @@ export default function Room() {
       setText("");
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 3000);
+      // 投稿者情報をvisitorsに反映
+      updateVisitorInfo(
+        room.id,
+        sessionId,
+        showCompany ? companyName : null,
+        showName ? authorName : null
+      );
     } catch {
       setSubmitError("投稿に失敗しました。もう一度お試しください。");
     } finally {

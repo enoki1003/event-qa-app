@@ -245,9 +245,15 @@ export default function HostRoom() {
             </button>
             <button
               onClick={() => exportCsv(questions, room.title)}
-              className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
+              className="px-2.5 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
             >
               CSV
+            </button>
+            <button
+              onClick={() => navigate(`/host/room/${roomId}/report`)}
+              className="px-2.5 py-1.5 border border-indigo-200 text-indigo-600 text-xs rounded-lg hover:bg-indigo-50 font-medium"
+            >
+              レポート
             </button>
           </div>
         </div>
