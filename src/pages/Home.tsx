@@ -40,11 +40,11 @@ export default function Home() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-xl">
             <span className="text-2xl">📷</span>
             <div>
-              <p className="text-sm font-medium text-orange-900">QRコードで参加</p>
-              <p className="text-xs text-orange-600 mt-0.5">イベント内で案内中のQRコードをスマホのカメラで読み取っていただくとそのまま入室できます</p>
+              <p className="text-sm font-medium text-amber-900">QRコードで参加</p>
+              <p className="text-xs text-amber-700 mt-0.5">イベント内で案内中のQRコードをスマホのカメラで読み取っていただくとそのまま入室できます</p>
             </div>
           </div>
 
@@ -62,7 +62,7 @@ export default function Home() {
               onChange={(e) => setCode(e.target.value.replace(/[^A-Z0-9]/gi, "").toUpperCase())}
               placeholder="例: ABC123"
               maxLength={8}
-              className="w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+              className="w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent"
               autoComplete="off"
               autoCorrect="off"
               autoCapitalize="characters"
@@ -73,7 +73,7 @@ export default function Home() {
             <button
               type="submit"
               disabled={!code.trim() || loading}
-              className="mt-3 w-full py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 active:bg-orange-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="mt-3 w-full py-3 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 active:bg-amber-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "確認中..." : "参加する"}
             </button>
