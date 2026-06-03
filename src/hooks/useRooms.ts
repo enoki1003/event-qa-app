@@ -62,10 +62,11 @@ export async function toggleRoomOpen(roomId: string, isOpen: boolean) {
   await update(ref(db, `rooms/${roomId}`), { isOpen });
 }
 
-export async function addSession(roomId: string, title: string, order: number): Promise<string> {
+export async function addSession(roomId: string, title: string, description: string, order: number): Promise<string> {
   const sessionsRef = ref(db, `rooms/${roomId}/sessions`);
   const result = await push(sessionsRef, {
     title,
+    description,
     order,
     createdAt: serverTimestamp(),
   });

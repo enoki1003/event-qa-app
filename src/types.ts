@@ -1,6 +1,7 @@
 export interface Session {
   id: string;
   title: string;
+  description: string;
   order: number;
   createdAt: number;
 }
@@ -34,6 +35,7 @@ export interface RoomSettings {
   authorMode: AuthorMode;
   slackWebhookUrl: string;
   requireApproval: boolean;
+  showTimestamp: boolean;
 }
 
 export interface Reply {

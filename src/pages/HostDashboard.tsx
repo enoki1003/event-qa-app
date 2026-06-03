@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS: RoomSettings = {
   authorMode: "anonymous",
   slackWebhookUrl: "",
   requireApproval: false,
+  showTimestamp: false,
 };
 
 type ModalMode = "create" | "edit";
@@ -144,7 +145,19 @@ export default function HostDashboard() {
                     className="w-4 h-4 accent-indigo-600"
                   />
                   <label htmlFor="approval" className="text-sm text-gray-700">
-                    質問を承認制にする（承認後に参加者画面に表示）
+                    承認制にする（承認後に参加者画面に表示）
+                  </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="timestamp"
+                    checked={form.settings.showTimestamp}
+                    onChange={(e) => updateSettings({ showTimestamp: e.target.checked })}
+                    className="w-4 h-4 accent-indigo-600"
+                  />
+                  <label htmlFor="timestamp" className="text-sm text-gray-700">
+                    投稿日時を表示する
                   </label>
                 </div>
                 <div>

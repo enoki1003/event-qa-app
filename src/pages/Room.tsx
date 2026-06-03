@@ -88,17 +88,13 @@ export default function Room() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const activeSessionId = room.activeSessionId ?? null;
-      const sessionTitle = activeSessionId && activeSessionId !== "ALL"
-        ? (room.sessions?.[activeSessionId]?.title ?? null)
-        : null;
       await submitQuestion(
         room.id,
         { text, companyName: showCompany ? companyName : null, authorName: showName ? authorName : null },
         sessionId,
         settings,
-        activeSessionId,
-        sessionTitle
+        room.activeSessionId ?? null,
+        activeSession?.title ?? null
       );
       setText("");
       setCompanyName("");
@@ -116,19 +112,34 @@ export default function Room() {
     toggleLike(room.id, questionId, sessionId);
   };
 
+  const activeSessionId = room.activeSessionId ?? null;
+  const activeSession = activeSessionId && activeSessionId !== "ALL"
+    ? sessions.find((s) => s.id === activeSessionId)
+    : null;
+  const sessions = Object.entries(room.sessions || {})
+    .map(([id, s]) => ({ id, ...s }))
+    .sort((a, b) => a.order - b.order);
+  const sessionDescription = activeSession?.description || room.description || "";
+
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* Header */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-xl mx-auto px-4 py-3">
           <h1 className="font-bold text-gray-900 truncate">{room.title}</h1>
-          {room.description && (
-            <p className="text-xs text-gray-400 truncate mt-0.5">{room.description}</p>
+          {activeSession && (
+            <p className="text-xs text-indigo-500 font-medium mt-0.5">{activeSession.title}</p>
           )}
         </div>
       </div>
 
       <div className="max-w-xl mx-auto px-4 pt-4 space-y-4">
+        {/* 案内テキスト */}
+        {sessionDescription && (
+          <div className="bg-indigo-50 border border-indigo-100 rounded-2xl px-4 py-3 text-sm text-indigo-800">
+            {sessionDescription}
+          </div>
+        )}
         {/* Submit form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
           {showCompany && (
@@ -169,7 +180,7 @@ export default function Room() {
               disabled={!canSubmit}
               className="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              {submitting ? "送信中..." : "質問する"}
+              {submitting ? "送信中..." : "投稿する"}
             </button>
           </div>
           {submitted && (
@@ -227,6 +238,11 @@ export default function Room() {
                       {q.isAnswered && (
                         <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
                           回答済み
+                        </span>
+                      )}
+                      {settings.showTimestamp && q.createdAt && (
+                        <span className="text-xs text-gray-300">
+                          {new Date(q.createdAt).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       )}
                     </div>

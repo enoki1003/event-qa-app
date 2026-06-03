@@ -58,6 +58,7 @@ export default function HostRoom() {
   const [showQr, setShowQr] = useState(false);
   const [showSessionForm, setShowSessionForm] = useState(false);
   const [newSessionTitle, setNewSessionTitle] = useState("");
+  const [newSessionDescription, setNewSessionDescription] = useState("");
   const [addingSession, setAddingSession] = useState(false);
   const [tab, setTab] = useState<"questions" | "sessions">("questions");
 
@@ -97,8 +98,9 @@ export default function HostRoom() {
     if (!newSessionTitle.trim() || addingSession) return;
     setAddingSession(true);
     try {
-      await addSession(roomId!, newSessionTitle.trim(), sessions.length);
+      await addSession(roomId!, newSessionTitle.trim(), newSessionDescription.trim(), sessions.length);
       setNewSessionTitle("");
+      setNewSessionDescription("");
       setShowSessionForm(false);
     } finally {
       setAddingSession(false);
@@ -270,30 +272,39 @@ export default function HostRoom() {
               </div>
 
               {showSessionForm && (
-                <form onSubmit={handleAddSession} className="flex gap-2 mb-3">
+                <form onSubmit={handleAddSession} className="mb-3 space-y-2 p-3 bg-gray-50 rounded-xl">
                   <input
                     type="text"
                     value={newSessionTitle}
                     onChange={(e) => setNewSessionTitle(e.target.value)}
-                    placeholder="セッション名を入力"
-                    className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    placeholder="セッション名（例: 第1部 Q&A）"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
                     autoFocus
                     required
                   />
-                  <button
-                    type="submit"
-                    disabled={addingSession}
-                    className="px-3 py-2 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 disabled:opacity-40"
-                  >
-                    追加
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowSessionForm(false)}
-                    className="px-3 py-2 border border-gray-200 text-gray-500 text-xs rounded-lg hover:bg-gray-50"
-                  >
-                    キャンセル
-                  </button>
+                  <input
+                    type="text"
+                    value={newSessionDescription}
+                    onChange={(e) => setNewSessionDescription(e.target.value)}
+                    placeholder="参加者への案内テキスト（任意）例: ご質問はこちらへどうぞ！"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      disabled={addingSession}
+                      className="px-3 py-2 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 disabled:opacity-40"
+                    >
+                      追加
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowSessionForm(false); setNewSessionTitle(""); setNewSessionDescription(""); }}
+                      className="px-3 py-2 border border-gray-200 text-gray-500 text-xs rounded-lg hover:bg-gray-50"
+                    >
+                      キャンセル
+                    </button>
+                  </div>
                 </form>
               )}
 
