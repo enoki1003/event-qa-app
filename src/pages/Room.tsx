@@ -5,11 +5,17 @@ import { useQuestions, submitQuestion, toggleLike } from "../hooks/useQuestions"
 import { useSession } from "../hooks/useSession";
 import type { AuthorMode } from "../types";
 
-function authorLabel(mode: AuthorMode, label: string): string {
-  if (mode === "name") return label || "お名前";
-  if (mode === "company") return label || "会社名";
-  if (mode === "name_company") return label || "会社名・お名前";
-  return "";
+function needsCompany(mode: AuthorMode) {
+  return mode === "both_required" || mode === "company_req_name_opt" || mode === "both_optional";
+}
+function needsName(mode: AuthorMode) {
+  return mode === "both_required" || mode === "company_req_name_opt" || mode === "both_optional";
+}
+function isCompanyRequired(mode: AuthorMode) {
+  return mode === "both_required" || mode === "company_req_name_opt";
+}
+function isNameRequired(mode: AuthorMode) {
+  return mode === "both_required";
 }
 
 export default function Room() {
@@ -20,6 +26,7 @@ export default function Room() {
   const questions = useQuestions(room?.id ?? "");
 
   const [text, setText] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -58,24 +65,38 @@ export default function Room() {
 
   const { settings } = room;
   const mode = settings.authorMode;
-  const needsAuthor = mode !== "anonymous";
-  const label = authorLabel(mode, settings.nameLabel);
+  const showCompany = needsCompany(mode);
+  const showName = needsName(mode);
+  const companyRequired = isCompanyRequired(mode);
+  const nameRequired = isNameRequired(mode);
+
+  const canSubmit =
+    text.trim() &&
+    !submitting &&
+    (!companyRequired || companyName.trim()) &&
+    (!nameRequired || authorName.trim());
 
   const visibleQuestions = questions.filter(
-    (q) => !q.isHidden && (q.status === "approved" || q.sessionId === sessionId)
+    (q) => !q.isHidden && (q.status === "approved" || q.browserSessionId === sessionId)
   );
   const sorted = [...visibleQuestions].sort((a, b) => b.likes - a.likes);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim() || submitting) return;
-    if (needsAuthor && !authorName.trim()) return;
+    if (!canSubmit) return;
 
     setSubmitting(true);
     setSubmitError("");
     try {
-      await submitQuestion(room.id, { text, authorName: needsAuthor ? authorName : null }, sessionId, settings);
+      await submitQuestion(
+        room.id,
+        { text, companyName: showCompany ? companyName : null, authorName: showName ? authorName : null },
+        sessionId,
+        settings
+      );
       setText("");
+      setCompanyName("");
+      setAuthorName("");
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 3000);
     } catch {
@@ -104,15 +125,26 @@ export default function Room() {
       <div className="max-w-xl mx-auto px-4 pt-4 space-y-4">
         {/* Submit form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          {needsAuthor && (
+          {showCompany && (
+            <input
+              type="text"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              placeholder={`会社名${companyRequired ? "（必須）" : "（任意）"}`}
+              maxLength={100}
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2"
+              required={companyRequired}
+            />
+          )}
+          {showName && (
             <input
               type="text"
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
-              placeholder={label}
+              placeholder={`お名前${nameRequired ? "（必須）" : "（任意）"}`}
               maxLength={50}
               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2"
-              required
+              required={nameRequired}
             />
           )}
           <textarea
@@ -128,7 +160,7 @@ export default function Room() {
             <span className="text-xs text-gray-400">{text.length}/500</span>
             <button
               type="submit"
-              disabled={!text.trim() || submitting || (needsAuthor && !authorName.trim())}
+              disabled={!canSubmit}
               className="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? "送信中..." : "質問する"}
@@ -152,6 +184,12 @@ export default function Room() {
             {sorted.map((q) => {
               const liked = !!q.likedBy?.[sessionId];
               const isPending = q.status === "pending";
+              const byLine = [q.companyName, q.authorName].filter(Boolean).join(" / ");
+              const isOwn = q.browserSessionId === sessionId;
+              const replies = Object.entries(q.replies || {})
+                .map(([id, r]) => ({ id, ...r }))
+                .filter((r) => !r.isPrivate || isOwn)
+                .sort((a, b) => a.createdAt - b.createdAt);
               return (
                 <div
                   key={q.id}
@@ -172,8 +210,8 @@ export default function Room() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 leading-relaxed">{q.text}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      {q.authorName && (
-                        <span className="text-xs text-gray-400">{q.authorName}</span>
+                      {byLine && (
+                        <span className="text-xs text-gray-400">{byLine}</span>
                       )}
                       {isPending && (
                         <span className="text-xs text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">
@@ -186,6 +224,19 @@ export default function Room() {
                         </span>
                       )}
                     </div>
+                    {replies.length > 0 && (
+                      <div className="mt-2 space-y-1.5">
+                        {replies.map((r) => (
+                          <div key={r.id} className={`text-xs rounded-xl px-3 py-2 ${
+                            r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-indigo-50 border border-indigo-100"
+                          }`}>
+                            <span className="font-medium text-indigo-700">登壇者より</span>
+                            {r.isPrivate && <span className="text-yellow-600 ml-1">（あなただけに表示）</span>}
+                            <p className="text-gray-700 mt-0.5">{r.text}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               );

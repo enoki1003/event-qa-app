@@ -41,14 +41,16 @@ export async function createRoom(
     description,
     code: generateCode(),
     isOpen: true,
+    sessions: {},
+    activeSessionId: null,
     createdAt: serverTimestamp(),
     settings,
   });
   return result.key!;
 }
 
-export async function updateRoom(roomId: string, data: Partial<Room>) {
-  await update(ref(db, `rooms/${roomId}`), data);
+export async function updateRoomSettings(roomId: string, title: string, description: string, settings: RoomSettings) {
+  await update(ref(db, `rooms/${roomId}`), { title, description, settings });
 }
 
 export async function deleteRoom(roomId: string) {
@@ -58,4 +60,22 @@ export async function deleteRoom(roomId: string) {
 
 export async function toggleRoomOpen(roomId: string, isOpen: boolean) {
   await update(ref(db, `rooms/${roomId}`), { isOpen });
+}
+
+export async function addSession(roomId: string, title: string, order: number): Promise<string> {
+  const sessionsRef = ref(db, `rooms/${roomId}/sessions`);
+  const result = await push(sessionsRef, {
+    title,
+    order,
+    createdAt: serverTimestamp(),
+  });
+  return result.key!;
+}
+
+export async function setActiveSession(roomId: string, activeSessionId: string | null) {
+  await update(ref(db, `rooms/${roomId}`), { activeSessionId });
+}
+
+export async function deleteSession(roomId: string, sessionId: string) {
+  await remove(ref(db, `rooms/${roomId}/sessions/${sessionId}`));
 }

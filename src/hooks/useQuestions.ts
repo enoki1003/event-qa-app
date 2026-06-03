@@ -37,20 +37,25 @@ export function useQuestions(roomId: string) {
 export async function submitQuestion(
   roomId: string,
   input: QuestionInput,
-  sessionId: string,
-  settings: RoomSettings
+  browserSessionId: string,
+  settings: RoomSettings,
+  activeSessionId: string | null,
+  sessionTitle: string | null
 ) {
   const qRef = ref(db, `questions/${roomId}`);
   await push(qRef, {
     roomId,
     text: input.text.trim(),
+    companyName: input.companyName || null,
     authorName: input.authorName || null,
     likes: 0,
     likedBy: {},
     status: settings.requireApproval ? "pending" : "approved",
     isAnswered: false,
     isHidden: false,
-    sessionId,
+    sessionId: activeSessionId === "ALL" ? null : activeSessionId,
+    sessionTitle,
+    browserSessionId,
     createdAt: serverTimestamp(),
   });
 }
@@ -85,4 +90,18 @@ export async function markAnswered(roomId: string, questionId: string, isAnswere
 
 export async function toggleHidden(roomId: string, questionId: string, isHidden: boolean) {
   await update(ref(db, `questions/${roomId}/${questionId}`), { isHidden });
+}
+
+export async function addReply(
+  roomId: string,
+  questionId: string,
+  text: string,
+  isPrivate: boolean
+) {
+  const repliesRef = ref(db, `questions/${roomId}/${questionId}/replies`);
+  await push(repliesRef, {
+    text: text.trim(),
+    isPrivate,
+    createdAt: serverTimestamp(),
+  });
 }
