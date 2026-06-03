@@ -43,6 +43,8 @@ export default function Home() {
           <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
             <span className="text-2xl">📷</span>
             <div>
+              <p className="text-sm font-medium text-orange-900">QRコードで参加</p>
+              <p className="text-xs text-orange-600 mt-0.5">イベント内で案内中のQRコードをスマホのカメラで読み取っていただくとそのまま入室できます</p>
             </div>
           </div>
 
