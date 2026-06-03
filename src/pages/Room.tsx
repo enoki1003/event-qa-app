@@ -142,6 +142,12 @@ export default function Room() {
         )}
         {/* Submit form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+          {activeSession && (
+            <div className="mb-3 pb-3 border-b border-gray-100">
+              <p className="text-xs text-gray-400">現在のセッション</p>
+              <p className="text-sm font-semibold text-indigo-700">{activeSession.title}</p>
+            </div>
+          )}
           {showCompany && (
             <input
               type="text"
