@@ -88,11 +88,17 @@ export default function Room() {
     setSubmitting(true);
     setSubmitError("");
     try {
+      const activeSessionId = room.activeSessionId ?? null;
+      const sessionTitle = activeSessionId && activeSessionId !== "ALL"
+        ? (room.sessions?.[activeSessionId]?.title ?? null)
+        : null;
       await submitQuestion(
         room.id,
         { text, companyName: showCompany ? companyName : null, authorName: showName ? authorName : null },
         sessionId,
-        settings
+        settings,
+        activeSessionId,
+        sessionTitle
       );
       setText("");
       setCompanyName("");

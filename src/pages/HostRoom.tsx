@@ -152,11 +152,6 @@ export default function HostRoom() {
     { key: "answered", label: `回答済み (${counts.answered})` },
   ];
 
-  const statusBadge = (status: QuestionStatus) => {
-    if (status === "approved") return <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">承認済み</span>;
-    if (status === "rejected") return <span className="text-xs bg-red-100 text-red-500 px-2 py-0.5 rounded-full">却下</span>;
-    return <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">承認待ち</span>;
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
