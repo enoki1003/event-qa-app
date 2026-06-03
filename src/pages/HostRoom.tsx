@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCodeSVG, QRCodeCanvas } from "qrcode.react";
 import { ref, update } from "firebase/database";
 import { db } from "../firebase";
 import { isHostAuth } from "./HostLogin";
@@ -78,6 +78,16 @@ export default function HostRoom() {
   const [qFilter, setQFilter] = useState<QFilter>("all");
   const [sessionFilter, setSessionFilter] = useState<string>("all");
   const [showQr, setShowQr] = useState(false);
+  const qrCanvasRef = useRef<HTMLDivElement>(null);
+
+  const downloadQr = () => {
+    const canvas = qrCanvasRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const link = document.createElement("a");
+    link.download = `${room?.title ?? "QR"}_QR.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
   const [showSessionForm, setShowSessionForm] = useState(false);
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [newSessionDescription, setNewSessionDescription] = useState("");
@@ -299,13 +309,24 @@ export default function HostRoom() {
             onClick={(e) => e.stopPropagation()}
           >
             <QRCodeSVG value={roomUrl} size={240} />
+            <div ref={qrCanvasRef} style={{ display: "none" }}>
+              <QRCodeCanvas value={roomUrl} size={400} />
+            </div>
             <p className="text-sm text-gray-500 font-mono text-center break-all max-w-xs">{roomUrl}</p>
-            <button
-              onClick={() => navigator.clipboard.writeText(roomUrl)}
-              className="text-sm text-amber-600 hover:underline"
-            >
-              URLをコピー
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={downloadQr}
+                className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600"
+              >
+                QR画像を保存
+              </button>
+              <button
+                onClick={() => navigator.clipboard.writeText(roomUrl)}
+                className="px-4 py-2 border border-gray-200 text-gray-600 text-sm rounded-lg hover:bg-gray-50"
+              >
+                URLをコピー
+              </button>
+            </div>
             <button
               onClick={() => setShowQr(false)}
               className="text-sm text-gray-400 hover:text-gray-600"
