@@ -33,12 +33,16 @@ function generateCode(): string {
 export async function createRoom(
   title: string,
   description: string,
+  eventDate: string,
+  eventTime: string,
   settings: RoomSettings
 ): Promise<string> {
   const roomsRef = ref(db, "rooms");
   const result = await push(roomsRef, {
     title,
     description,
+    eventDate,
+    eventTime,
     code: generateCode(),
     isOpen: true,
     sessions: {},
@@ -49,8 +53,8 @@ export async function createRoom(
   return result.key!;
 }
 
-export async function updateRoomSettings(roomId: string, title: string, description: string, settings: RoomSettings) {
-  await update(ref(db, `rooms/${roomId}`), { title, description, settings });
+export async function updateRoomSettings(roomId: string, title: string, description: string, eventDate: string, eventTime: string, settings: RoomSettings) {
+  await update(ref(db, `rooms/${roomId}`), { title, description, eventDate, eventTime, settings });
 }
 
 export async function deleteRoom(roomId: string) {

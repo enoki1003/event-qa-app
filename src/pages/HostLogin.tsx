@@ -30,7 +30,7 @@ export default function HostLogin() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🎤</div>
-          <h1 className="text-2xl font-bold text-gray-900">登壇者ログイン</h1>
+          <h1 className="text-2xl font-bold text-gray-900">主催者ログイン</h1>
         </div>
         <form onSubmit={handleLogin} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">

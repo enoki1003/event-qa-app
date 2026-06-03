@@ -80,6 +80,10 @@ export async function approveQuestion(roomId: string, questionId: string) {
   await update(ref(db, `questions/${roomId}/${questionId}`), { status: "approved" });
 }
 
+export async function pendingQuestion(roomId: string, questionId: string) {
+  await update(ref(db, `questions/${roomId}/${questionId}`), { status: "pending" });
+}
+
 export async function rejectQuestion(roomId: string, questionId: string) {
   await update(ref(db, `questions/${roomId}/${questionId}`), { status: "rejected" });
 }

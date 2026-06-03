@@ -12,17 +12,14 @@ export interface Room {
   description: string;
   code: string;
   isOpen: boolean;
+  eventDate: string;
+  eventTime: string;
   createdAt: number;
   settings: RoomSettings;
   sessions: Record<string, Omit<Session, "id">>;
-  // null=全停止, "ALL"=全セッション受付, sessionId=特定セッションのみ
   activeSessionId: string | null;
 }
 
-// 会社名（必須）/名前（必須）
-// 会社名（必須）/名前（任意）
-// 会社名（任意）/名前（任意）
-// 匿名
 export type AuthorMode =
   | "anonymous"
   | "both_required"
@@ -36,6 +33,7 @@ export interface RoomSettings {
   slackWebhookUrl: string;
   requireApproval: boolean;
   showTimestamp: boolean;
+  replyAuthorLabel: string;
 }
 
 export interface Reply {

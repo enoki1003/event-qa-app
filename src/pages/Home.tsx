@@ -13,27 +13,16 @@ export default function Home() {
     e.preventDefault();
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) return;
-
     setLoading(true);
     setError("");
-
     try {
       const snapshot = await get(ref(db, "rooms"));
-      if (!snapshot.exists()) {
-        setError("ルームが見つかりませんでした。コードを確認してください。");
-        return;
-      }
+      if (!snapshot.exists()) { setError("ルームが見つかりませんでした。コードを確認してください。"); return; }
       const rooms = snapshot.val();
       const entry = Object.entries(rooms).find(([_, r]: any) => r.code === trimmed);
-      if (!entry) {
-        setError("ルームが見つかりませんでした。コードを確認してください。");
-        return;
-      }
+      if (!entry) { setError("ルームが見つかりませんでした。コードを確認してください。"); return; }
       const room: any = entry[1];
-      if (!room.isOpen) {
-        setError("このルームは現在締め切られています。");
-        return;
-      }
+      if (!room.isOpen) { setError("このルームは現在締め切られています。"); return; }
       navigate(`/room/${trimmed}`);
     } catch {
       setError("エラーが発生しました。もう一度お試しください。");
@@ -46,20 +35,16 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">💬</div>
           <h1 className="text-2xl font-bold text-gray-900">Q&A</h1>
-          <p className="text-gray-500 text-sm mt-1">イベントに参加して質問しよう</p>
+          <p className="text-gray-500 text-sm mt-1">イベントの質問はこちらから！</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
-          {/* QRコード案内 */}
           <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
             <span className="text-2xl">📷</span>
             <div>
               <p className="text-sm font-medium text-indigo-900">QRコードで参加</p>
-              <p className="text-xs text-indigo-600 mt-0.5">
-                スマホのカメラでQRコードを読み取るとそのまま入室できます
-              </p>
+              <p className="text-xs text-indigo-600 mt-0.5">スマホのカメラでQRコードを読み取るとそのまま入室できます</p>
             </div>
           </div>
 
@@ -69,11 +54,8 @@ export default function Home() {
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
-          {/* コード入力 */}
           <form onSubmit={handleJoin}>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              ルームコードで参加
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">ルームコードで参加</label>
             <input
               type="text"
               value={code}
@@ -87,9 +69,7 @@ export default function Home() {
               spellCheck={false}
               inputMode="text"
             />
-            {error && (
-              <p className="mt-2 text-sm text-red-500">{error}</p>
-            )}
+            {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
             <button
               type="submit"
               disabled={!code.trim() || loading}
@@ -101,9 +81,7 @@ export default function Home() {
         </div>
 
         <p className="text-center mt-6 text-xs text-gray-400">
-          <a href="/host" className="hover:text-gray-600 transition-colors">
-            登壇者はこちら →
-          </a>
+          <a href="/host" className="hover:text-gray-600 transition-colors">主催者はこちら →</a>
         </p>
       </div>
     </div>
