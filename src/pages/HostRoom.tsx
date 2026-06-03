@@ -195,7 +195,7 @@ export default function HostRoom() {
         <div className={`px-4 py-1.5 text-xs font-medium text-center ${
           !activeSessionId ? "bg-gray-100 text-gray-500"
           : activeSessionId === "ALL" ? "bg-blue-50 text-blue-700"
-          : "bg-indigo-50 text-indigo-700"
+          : "bg-orange-50 text-orange-600"
         }`}>
           {currentLabel}
         </div>
@@ -207,7 +207,7 @@ export default function HostRoom() {
               key={t}
               onClick={() => setTab(t)}
               className={`py-2 text-sm font-medium border-b-2 transition-colors ${
-                tab === t ? "border-indigo-600 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-700"
+                tab === t ? "border-orange-500 text-orange-500" : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
               {t === "questions" ? "質問" : "セッション"}
@@ -222,7 +222,7 @@ export default function HostRoom() {
           <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
             <QRCodeSVG value={roomUrl} size={240} />
             <p className="text-sm text-gray-500 font-mono text-center break-all max-w-xs">{roomUrl}</p>
-            <button onClick={() => navigator.clipboard.writeText(roomUrl)} className="text-sm text-indigo-600 hover:underline">URLをコピー</button>
+            <button onClick={() => navigator.clipboard.writeText(roomUrl)} className="text-sm text-orange-500 hover:underline">URLをコピー</button>
             <button onClick={() => setShowQr(false)} className="text-sm text-gray-400 hover:text-gray-600">閉じる</button>
           </div>
         </div>
@@ -265,7 +265,7 @@ export default function HostRoom() {
                 <p className="text-sm font-medium text-gray-700">セッション一覧</p>
                 <button
                   onClick={() => setShowSessionForm(true)}
-                  className="text-xs text-indigo-600 hover:underline"
+                  className="text-xs text-orange-500 hover:underline"
                 >
                   ＋ セッション追加
                 </button>
@@ -278,7 +278,7 @@ export default function HostRoom() {
                     value={newSessionTitle}
                     onChange={(e) => setNewSessionTitle(e.target.value)}
                     placeholder="セッション名（例: 第1部 Q&A）"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
                     autoFocus
                     required
                   />
@@ -287,13 +287,13 @@ export default function HostRoom() {
                     value={newSessionDescription}
                     onChange={(e) => setNewSessionDescription(e.target.value)}
                     placeholder="参加者への案内テキスト（任意）例: ご質問はこちらへどうぞ！"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
                   />
                   <div className="flex gap-2">
                     <button
                       type="submit"
                       disabled={addingSession}
-                      className="px-3 py-2 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 disabled:opacity-40"
+                      className="px-3 py-2 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 disabled:opacity-40"
                     >
                       追加
                     </button>
@@ -319,7 +319,7 @@ export default function HostRoom() {
                       <div
                         key={session.id}
                         className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                          isActive ? "bg-indigo-50 border-indigo-200" : "bg-gray-50 border-gray-100"
+                          isActive ? "bg-orange-50 border-orange-200" : "bg-gray-50 border-gray-100"
                         }`}
                       >
                         <span className="text-xs text-gray-400 w-5 text-center">{i + 1}</span>
@@ -328,13 +328,13 @@ export default function HostRoom() {
                           <p className="text-xs text-gray-400">{sessionQCount}件の質問</p>
                         </div>
                         {isActive && (
-                          <span className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full">受付中</span>
+                          <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">受付中</span>
                         )}
                         <div className="flex gap-1">
                           {!isActive && (
                             <button
                               onClick={() => handleStartSession(session.id)}
-                              className="px-2 py-1 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700"
+                              className="px-2 py-1 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600"
                             >
                               開始
                             </button>
@@ -411,7 +411,7 @@ export default function HostRoom() {
                   key={f.key}
                   onClick={() => setQFilter(f.key)}
                   className={`flex-shrink-0 px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
-                    qFilter === f.key ? "bg-indigo-600 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    qFilter === f.key ? "bg-orange-500 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   {f.label}
@@ -513,7 +513,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
         <div className="mt-3 ml-10 space-y-2">
           {replies.map((r) => (
             <div key={r.id} className={`text-xs rounded-xl px-3 py-2 ${
-              r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-indigo-50 border border-indigo-100"
+              r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-orange-50 border border-orange-100"
             }`}>
               <div className="flex items-center gap-1 mb-0.5">
                 <span className="font-medium text-gray-600">返信</span>
@@ -557,7 +557,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
         </button>
         <button
           onClick={() => setShowReplyForm((v) => !v)}
-          className="px-3 py-1.5 border border-indigo-200 text-indigo-600 text-xs rounded-lg hover:bg-indigo-50"
+          className="px-3 py-1.5 border border-orange-200 text-orange-500 text-xs rounded-lg hover:bg-orange-50"
         >
           返信する
         </button>
@@ -571,7 +571,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
             onChange={(e) => setReplyText(e.target.value)}
             placeholder="返信内容を入力..."
             rows={2}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
             required
             autoFocus
           />
@@ -581,7 +581,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
                 type="checkbox"
                 checked={!isPrivate}
                 onChange={(e) => setIsPrivate(!e.target.checked)}
-                className="w-3.5 h-3.5 accent-indigo-600"
+                className="w-3.5 h-3.5 accent-orange-500"
               />
               全体にも公開する
             </label>
@@ -596,7 +596,7 @@ function QuestionCard({ q, roomId, onApprove }: QuestionCardProps) {
               <button
                 type="submit"
                 disabled={!replyText.trim() || sendingReply}
-                className="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg hover:bg-indigo-700 disabled:opacity-40"
+                className="px-3 py-1.5 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 disabled:opacity-40"
               >
                 {sendingReply ? "送信中..." : isPrivate ? "送信（投稿者のみ）" : "送信（全体に公開）"}
               </button>

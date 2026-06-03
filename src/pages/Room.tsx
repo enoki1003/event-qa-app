@@ -44,7 +44,7 @@ export default function Room() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
         <p className="text-red-500">{error || "ルームが見つかりません"}</p>
-        <button onClick={() => navigate("/")} className="text-indigo-600 hover:underline text-sm">
+        <button onClick={() => navigate("/")} className="text-orange-500 hover:underline text-sm">
           トップに戻る
         </button>
       </div>
@@ -56,7 +56,7 @@ export default function Room() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
         <div className="text-4xl">🔒</div>
         <p className="text-gray-600 font-medium">このルームは現在締め切られています</p>
-        <button onClick={() => navigate("/")} className="text-indigo-600 hover:underline text-sm">
+        <button onClick={() => navigate("/")} className="text-orange-500 hover:underline text-sm">
           トップに戻る
         </button>
       </div>
@@ -128,7 +128,7 @@ export default function Room() {
         <div className="max-w-xl mx-auto px-4 py-3">
           <h1 className="font-bold text-gray-900 truncate">{room.title}</h1>
           {activeSession && (
-            <p className="text-xs text-indigo-500 font-medium mt-0.5">{activeSession.title}</p>
+            <p className="text-xs text-orange-400 font-medium mt-0.5">{activeSession.title}</p>
           )}
         </div>
       </div>
@@ -136,7 +136,7 @@ export default function Room() {
       <div className="max-w-xl mx-auto px-4 pt-4 space-y-4">
         {/* 案内テキスト */}
         {sessionDescription && (
-          <div className="bg-indigo-50 border border-indigo-100 rounded-2xl px-4 py-3 text-sm text-indigo-800">
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl px-4 py-3 text-sm text-orange-700">
             {sessionDescription}
           </div>
         )}
@@ -145,7 +145,7 @@ export default function Room() {
           {activeSession && (
             <div className="mb-3 pb-3 border-b border-gray-100">
               <p className="text-xs text-gray-400">現在のセッション</p>
-              <p className="text-sm font-semibold text-indigo-700">{activeSession.title}</p>
+              <p className="text-sm font-semibold text-orange-600">{activeSession.title}</p>
             </div>
           )}
           {showCompany && (
@@ -155,7 +155,7 @@ export default function Room() {
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder={`会社名${companyRequired ? "（必須）" : "（任意）"}`}
               maxLength={100}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 mb-2"
               required={companyRequired}
             />
           )}
@@ -166,7 +166,7 @@ export default function Room() {
               onChange={(e) => setAuthorName(e.target.value)}
               placeholder={`お名前${nameRequired ? "（必須）" : "（任意）"}`}
               maxLength={50}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 mb-2"
               required={nameRequired}
             />
           )}
@@ -176,7 +176,7 @@ export default function Room() {
             placeholder="質問を入力してください..."
             maxLength={500}
             rows={3}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
             required
           />
           <div className="flex items-center justify-between mt-2">
@@ -184,7 +184,7 @@ export default function Room() {
             <button
               type="submit"
               disabled={!canSubmit}
-              className="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-5 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? "送信中..." : "投稿する"}
             </button>
@@ -224,7 +224,7 @@ export default function Room() {
                     onClick={() => !isPending && handleLike(q.id)}
                     disabled={isPending}
                     className={`flex flex-col items-center min-w-[40px] pt-1 transition-colors ${
-                      liked ? "text-indigo-600" : "text-gray-300 hover:text-indigo-400"
+                      liked ? "text-orange-500" : "text-gray-300 hover:text-orange-300"
                     } ${isPending ? "cursor-default" : "cursor-pointer"}`}
                   >
                     <span className="text-lg">▲</span>
@@ -256,9 +256,9 @@ export default function Room() {
                       <div className="mt-2 space-y-1.5">
                         {replies.map((r) => (
                           <div key={r.id} className={`text-xs rounded-xl px-3 py-2 ${
-                            r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-indigo-50 border border-indigo-100"
+                            r.isPrivate ? "bg-yellow-50 border border-yellow-100" : "bg-orange-50 border border-orange-100"
                           }`}>
-                            <span className="font-medium text-indigo-700">登壇者より</span>
+                            <span className="font-medium text-orange-600">登壇者より</span>
                             {r.isPrivate && <span className="text-yellow-600 ml-1">（あなただけに表示）</span>}
                             <p className="text-gray-700 mt-0.5">{r.text}</p>
                           </div>
