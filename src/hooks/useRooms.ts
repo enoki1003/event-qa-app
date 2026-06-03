@@ -84,3 +84,20 @@ export async function setActiveSession(roomId: string, activeSessionId: string |
 export async function deleteSession(roomId: string, sessionId: string) {
   await remove(ref(db, `rooms/${roomId}/sessions/${sessionId}`));
 }
+
+export async function duplicateRoom(source: Room): Promise<string> {
+  const roomsRef = ref(db, "rooms");
+  const result = await push(roomsRef, {
+    title: `${source.title} (コピー)`,
+    description: source.description || "",
+    eventDate: source.eventDate || "",
+    eventTime: source.eventTime || "",
+    code: generateCode(),
+    isOpen: false,
+    sessions: source.sessions || {},
+    activeSessionId: null,
+    createdAt: serverTimestamp(),
+    settings: source.settings,
+  });
+  return result.key!;
+}
