@@ -234,7 +234,7 @@ export default function Room() {
                   .sort((a, b) => a.createdAt - b.createdAt);
 
                 return (
-                  <div key={q.id} className={`border rounded-xl p-3 ${q.isAnswered ? "opacity-60" : ""} ${isPending ? "bg-gray-50 border-gray-200" : "bg-white border-gray-200"}`}>
+                  <div key={q.id} className={`border rounded-xl px-3 py-2 ${q.isAnswered ? "opacity-60" : ""} ${isPending ? "bg-gray-50 border-gray-200" : "bg-white border-gray-200"}`}>
                     <p className="text-sm text-gray-800 leading-relaxed">{q.text}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-1.5">
                       {byLine && <span className="text-xs text-gray-400">{byLine}</span>}
