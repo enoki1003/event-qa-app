@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { isHostAuth } from "./HostLogin";
 import { useRoomById } from "../hooks/useRoom";
@@ -35,6 +35,7 @@ export default function HostReport() {
   const { room } = useRoomById(roomId ?? "");
   const questions = useQuestions(roomId ?? "");
   const { visitors, loading: visitorsLoading } = useVisitors(roomId ?? "");
+  const [visitorSort, setVisitorSort] = useState<"access" | "questions">("access");
 
   useEffect(() => {
     if (!isHostAuth()) navigate("/host");
@@ -156,6 +157,14 @@ export default function HostReport() {
               参加者一覧
               <span className="text-sm font-normal text-gray-400 ml-2">{visitors.length}人</span>
             </h2>
+            <div className="flex gap-1">
+              {(["access", "questions"] as const).map((s) => (
+                <button key={s} onClick={() => setVisitorSort(s)}
+                  className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${visitorSort === s ? "bg-rimo-100 text-rimo-700 font-medium" : "text-gray-400 hover:text-gray-600"}`}>
+                  {s === "access" ? "アクセス順" : "質問数順"}
+                </button>
+              ))}
+            </div>
           </div>
 
           {visitorsLoading ? (
@@ -173,8 +182,10 @@ export default function HostReport() {
                 <div className="col-span-4">初回アクセス日時</div>
                 <div className="col-span-2">質問数</div>
               </div>
-              {visitors.map((v, i) => {
-                const qCount = questions.filter((q) => q.browserSessionId === v.sessionId).length;
+              {[...visitors]
+                .map((v) => ({ ...v, qCount: questions.filter((q) => q.browserSessionId === v.sessionId).length }))
+                .sort((a, b) => visitorSort === "questions" ? b.qCount - a.qCount : a.firstAccessAt - b.firstAccessAt)
+                .map((v, i) => {
                 const displayName = [v.companyName, v.authorName].filter(Boolean).join(" / ") || "匿名";
                 return (
                   <div key={v.sessionId} className="grid grid-cols-12 gap-2 px-5 py-3 items-center hover:bg-gray-50/50">
@@ -191,8 +202,8 @@ export default function HostReport() {
                       </p>
                     </div>
                     <div className="col-span-2">
-                      <span className={`text-xs font-medium ${qCount > 0 ? "text-rimo-600" : "text-gray-300"}`}>
-                        {qCount > 0 ? `${qCount}件` : "—"}
+                      <span className={`text-xs font-medium ${v.qCount > 0 ? "text-rimo-600" : "text-gray-300"}`}>
+                        {v.qCount > 0 ? `${v.qCount}件` : "—"}
                       </span>
                     </div>
                   </div>
