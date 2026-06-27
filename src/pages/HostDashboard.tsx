@@ -20,6 +20,8 @@ const DEFAULT_SETTINGS: RoomSettings = {
   replyAuthorLabel: "",
   ctaLabel: "",
   ctaUrl: "",
+  surveyLabel: "",
+  surveyUrl: "",
 };
 
 interface FormState {

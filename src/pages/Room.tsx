@@ -163,9 +163,23 @@ export default function Room() {
             href={settings.ctaUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full py-3 bg-rimo-500 text-white text-sm font-semibold rounded-2xl text-center hover:bg-rimo-600 transition-colors shadow-sm"
+            className="block w-full py-3 text-white text-sm font-semibold rounded-2xl text-center transition-opacity hover:opacity-90 shadow-sm"
+            style={{ backgroundColor: "#F18900" }}
           >
             {settings.ctaLabel || "詳細・お申し込みはこちら"}
+          </a>
+        )}
+
+        {/* アンケートボタン */}
+        {settings.surveyUrl && (
+          <a
+            href={settings.surveyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full py-3 text-white text-sm font-semibold rounded-2xl text-center transition-opacity hover:opacity-90 shadow-sm"
+            style={{ backgroundColor: "#F7AF00" }}
+          >
+            {settings.surveyLabel || "アンケートに回答する"}
           </a>
         )}
 

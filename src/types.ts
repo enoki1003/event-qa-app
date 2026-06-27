@@ -36,6 +36,8 @@ export interface RoomSettings {
   replyAuthorLabel: string;
   ctaLabel: string;
   ctaUrl: string;
+  surveyLabel: string;
+  surveyUrl: string;
 }
 
 export interface Reply {

@@ -1193,7 +1193,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
   const [description, setDescription] = useState(room.description || "");
   const [eventDate, setEventDate] = useState(room.eventDate || "");
   const [eventTime, setEventTime] = useState(room.eventTime || "");
-  const DEFAULT_S: RoomSettings = { authorMode: "anonymous", slackWebhookUrl: "", requireApproval: false, showTimestamp: false, replyAuthorLabel: "", ctaLabel: "", ctaUrl: "" };
+  const DEFAULT_S: RoomSettings = { authorMode: "anonymous", slackWebhookUrl: "", requireApproval: false, showTimestamp: false, replyAuthorLabel: "", ctaLabel: "", ctaUrl: "", surveyLabel: "", surveyUrl: "" };
   const [settings, setSettings] = useState<RoomSettings>({ ...DEFAULT_S, ...room.settings });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -1307,28 +1307,62 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
         </label>
       </div>
 
-      <div className="border-t border-gray-100 pt-4">
-        <p className="text-sm font-medium text-gray-700 mb-3">CTAボタン（任意）</p>
-        <p className="text-xs text-gray-400 mb-3">設定すると参加者ページにボタンが表示されます。URLが未設定の場合は非表示。</p>
-        <div className="space-y-2">
+      <div className="border-t border-gray-100 pt-4 space-y-4">
+        <p className="text-sm font-medium text-gray-700">ボタン設定（任意）</p>
+        <p className="text-xs text-gray-400 -mt-2">URLを設定すると参加者ページにボタンが表示されます。</p>
+
+        {/* CTAボタン */}
+        <div className="p-3 rounded-xl border border-gray-100 bg-gray-50 space-y-2">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: "#F18900" }} />
+            <p className="text-xs font-medium text-gray-600">CTAボタン（例: 無料相談会の予約）</p>
+          </div>
           <div>
-            <label className="text-xs text-gray-600">ボタン文言</label>
+            <label className="text-xs text-gray-500">ボタン文言</label>
             <input
               type="text"
               value={settings.ctaLabel}
               onChange={(e) => upd({ ctaLabel: e.target.value })}
               placeholder="無料相談会の予約はこちら"
-              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
+              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm bg-white"
             />
           </div>
           <div>
-            <label className="text-xs text-gray-600">遷移先URL</label>
+            <label className="text-xs text-gray-500">遷移先URL</label>
             <input
               type="url"
               value={settings.ctaUrl}
               onChange={(e) => upd({ ctaUrl: e.target.value })}
               placeholder="https://spir.app/..."
-              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
+              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm bg-white"
+            />
+          </div>
+        </div>
+
+        {/* アンケートボタン */}
+        <div className="p-3 rounded-xl border border-gray-100 bg-gray-50 space-y-2">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: "#F7AF00" }} />
+            <p className="text-xs font-medium text-gray-600">アンケートボタン</p>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500">ボタン文言</label>
+            <input
+              type="text"
+              value={settings.surveyLabel}
+              onChange={(e) => upd({ surveyLabel: e.target.value })}
+              placeholder="アンケートに回答する"
+              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm bg-white"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-gray-500">遷移先URL</label>
+            <input
+              type="url"
+              value={settings.surveyUrl}
+              onChange={(e) => upd({ surveyUrl: e.target.value })}
+              placeholder="https://forms.google.com/..."
+              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm bg-white"
             />
           </div>
         </div>
