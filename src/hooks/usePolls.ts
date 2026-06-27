@@ -64,6 +64,10 @@ export async function closePoll(roomId: string, pollId: string) {
   await update(ref(db, `polls/${roomId}/${pollId}`), { status: "closed" });
 }
 
+export async function togglePollHidden(roomId: string, pollId: string, isHidden: boolean) {
+  await update(ref(db, `polls/${roomId}/${pollId}`), { isHidden });
+}
+
 export async function deletePoll(roomId: string, pollId: string) {
   await remove(ref(db, `polls/${roomId}/${pollId}`));
 }

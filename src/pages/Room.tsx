@@ -139,7 +139,7 @@ export default function Room() {
   const sessionBannerTitle = activeSession?.title ?? (activeSessionId === "ALL" ? null : null);
   const sessionBannerDesc = activeSession?.description ?? null;
   const replyLabel = settings.replyAuthorLabel || "登壇者";
-  const activePolls = polls.filter((p) => p.status === "active" || p.status === "closed");
+  const activePolls = polls.filter((p) => !p.isHidden && (p.status === "active" || p.status === "closed"));
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">

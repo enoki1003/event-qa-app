@@ -27,6 +27,7 @@ import {
   updatePoll,
   activatePoll,
   closePoll,
+  togglePollHidden,
   deletePoll,
 } from "../hooks/usePolls";
 import type { AuthorMode, Poll, Question, RoomSettings, Session } from "../types";
@@ -1078,7 +1079,7 @@ function PollsPanel({
               return (
                 <div
                   key={poll.id}
-                  className={`p-4 rounded-xl border transition-colors ${
+                  className={`p-4 rounded-xl border transition-colors ${poll.isHidden ? "opacity-50" : ""} ${
                     poll.status === "active"
                       ? "bg-green-50 border-green-200"
                       : poll.status === "closed"
@@ -1093,6 +1094,9 @@ function PollsPanel({
                         {statusBadge(poll)}
                         {poll.allowMultiple && (
                           <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">複数選択</span>
+                        )}
+                        {poll.isHidden && (
+                          <span className="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">参加者に非表示</span>
                         )}
                         <span className="text-xs text-gray-400">{respondents}人回答</span>
                       </div>
@@ -1130,6 +1134,12 @@ function PollsPanel({
                           再開
                         </button>
                       )}
+                      <button
+                        onClick={() => togglePollHidden(roomId, poll.id, !poll.isHidden)}
+                        className="px-2 py-1 border border-gray-200 text-gray-500 text-xs rounded-lg hover:bg-gray-50"
+                      >
+                        {poll.isHidden ? "再表示" : "非表示"}
+                      </button>
                       <button
                         onClick={() => {
                           if (confirm(`「${poll.title}」を削除しますか？`)) deletePoll(roomId, poll.id);

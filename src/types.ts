@@ -82,6 +82,7 @@ export interface Poll {
   options: string[]; // max 5
   status: PollStatus;
   allowMultiple: boolean;
+  isHidden: boolean;
   order: number;
   createdAt: number;
   votes: Record<string, number[]>; // browserSessionId -> selected option indices
