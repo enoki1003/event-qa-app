@@ -157,6 +157,18 @@ export default function Room() {
       </div>
 
       <div className="max-w-xl mx-auto px-4 pt-4 space-y-4">
+        {/* CTAボタン */}
+        {settings.ctaUrl && (
+          <a
+            href={settings.ctaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full py-3 bg-rimo-500 text-white text-sm font-semibold rounded-2xl text-center hover:bg-rimo-600 transition-colors shadow-sm"
+          >
+            {settings.ctaLabel || "詳細・お申し込みはこちら"}
+          </a>
+        )}
+
         {/* セッションバナー */}
         {(sessionBannerTitle || sessionBannerDesc) && (
           <div className="bg-rimo-50 border border-rimo-100 rounded-2xl px-4 py-3">

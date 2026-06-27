@@ -34,6 +34,8 @@ export interface RoomSettings {
   requireApproval: boolean;
   showTimestamp: boolean;
   replyAuthorLabel: string;
+  ctaLabel: string;
+  ctaUrl: string;
 }
 
 export interface Reply {

@@ -1193,7 +1193,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
   const [description, setDescription] = useState(room.description || "");
   const [eventDate, setEventDate] = useState(room.eventDate || "");
   const [eventTime, setEventTime] = useState(room.eventTime || "");
-  const DEFAULT_S: RoomSettings = { authorMode: "anonymous", slackWebhookUrl: "", requireApproval: false, showTimestamp: false, replyAuthorLabel: "" };
+  const DEFAULT_S: RoomSettings = { authorMode: "anonymous", slackWebhookUrl: "", requireApproval: false, showTimestamp: false, replyAuthorLabel: "", ctaLabel: "", ctaUrl: "" };
   const [settings, setSettings] = useState<RoomSettings>({ ...DEFAULT_S, ...room.settings });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -1305,6 +1305,33 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
           />
           投稿日時を表示する
         </label>
+      </div>
+
+      <div className="border-t border-gray-100 pt-4">
+        <p className="text-sm font-medium text-gray-700 mb-3">CTAボタン（任意）</p>
+        <p className="text-xs text-gray-400 mb-3">設定すると参加者ページにボタンが表示されます。URLが未設定の場合は非表示。</p>
+        <div className="space-y-2">
+          <div>
+            <label className="text-xs text-gray-600">ボタン文言</label>
+            <input
+              type="text"
+              value={settings.ctaLabel}
+              onChange={(e) => upd({ ctaLabel: e.target.value })}
+              placeholder="無料相談会の予約はこちら"
+              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-gray-600">遷移先URL</label>
+            <input
+              type="url"
+              value={settings.ctaUrl}
+              onChange={(e) => upd({ ctaUrl: e.target.value })}
+              placeholder="https://spir.app/..."
+              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
+            />
+          </div>
+        </div>
       </div>
 
       <div>
