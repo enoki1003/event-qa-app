@@ -25,11 +25,18 @@ export function usePolls(roomId: string) {
   return { polls, loading };
 }
 
-export async function createPoll(roomId: string, title: string, options: string[], order: number): Promise<string> {
+export async function createPoll(
+  roomId: string,
+  title: string,
+  options: string[],
+  order: number,
+  allowMultiple: boolean
+): Promise<string> {
   const result = await push(ref(db, `polls/${roomId}`), {
     title,
     options: options.filter((o) => o.trim()),
     status: "draft",
+    allowMultiple,
     order,
     createdAt: serverTimestamp(),
     votes: {},
@@ -40,11 +47,12 @@ export async function createPoll(roomId: string, title: string, options: string[
 export async function updatePoll(
   roomId: string,
   pollId: string,
-  data: { title: string; options: string[] }
+  data: { title: string; options: string[]; allowMultiple: boolean }
 ) {
   await update(ref(db, `polls/${roomId}/${pollId}`), {
     title: data.title,
     options: data.options.filter((o) => o.trim()),
+    allowMultiple: data.allowMultiple,
   });
 }
 
@@ -60,6 +68,6 @@ export async function deletePoll(roomId: string, pollId: string) {
   await remove(ref(db, `polls/${roomId}/${pollId}`));
 }
 
-export async function castVote(roomId: string, pollId: string, browserSessionId: string, optionIndex: number) {
-  await set(ref(db, `polls/${roomId}/${pollId}/votes/${browserSessionId}`), optionIndex);
+export async function castVote(roomId: string, pollId: string, browserSessionId: string, indices: number[]) {
+  await set(ref(db, `polls/${roomId}/${pollId}/votes/${browserSessionId}`), indices);
 }

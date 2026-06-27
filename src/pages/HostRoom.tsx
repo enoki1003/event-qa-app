@@ -113,6 +113,7 @@ export default function HostRoom() {
   const [editingPollId, setEditingPollId] = useState<string | null>(null);
   const [pollTitle, setPollTitle] = useState("");
   const [pollOptions, setPollOptions] = useState(["", "", "", "", ""]);
+  const [pollAllowMultiple, setPollAllowMultiple] = useState(false);
   const [savingPoll, setSavingPoll] = useState(false);
 
   useEffect(() => {
@@ -367,6 +368,8 @@ export default function HostRoom() {
             setPollTitle={setPollTitle}
             pollOptions={pollOptions}
             setPollOptions={setPollOptions}
+            pollAllowMultiple={pollAllowMultiple}
+            setPollAllowMultiple={setPollAllowMultiple}
             saving={savingPoll}
             setSaving={setSavingPoll}
           />
@@ -889,6 +892,8 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
 
 // ---- 投票パネル ----
 
+const CIRCLE_NUMS = ["①", "②", "③", "④", "⑤"];
+
 interface PollsPanelProps {
   roomId: string;
   polls: Poll[];
@@ -900,6 +905,8 @@ interface PollsPanelProps {
   setPollTitle: (v: string) => void;
   pollOptions: string[];
   setPollOptions: (v: string[]) => void;
+  pollAllowMultiple: boolean;
+  setPollAllowMultiple: (v: boolean) => void;
   saving: boolean;
   setSaving: (v: boolean) => void;
 }
@@ -910,11 +917,13 @@ function PollsPanel({
   editingPollId, setEditingPollId,
   pollTitle, setPollTitle,
   pollOptions, setPollOptions,
+  pollAllowMultiple, setPollAllowMultiple,
   saving, setSaving,
 }: PollsPanelProps) {
   const resetForm = () => {
     setPollTitle("");
     setPollOptions(["", "", "", "", ""]);
+    setPollAllowMultiple(false);
     setShowForm(false);
     setEditingPollId(null);
   };
@@ -924,6 +933,7 @@ function PollsPanel({
     setPollTitle(poll.title);
     const opts = [...poll.options, "", "", "", "", ""].slice(0, 5);
     setPollOptions(opts);
+    setPollAllowMultiple(poll.allowMultiple ?? false);
     setShowForm(true);
   };
 
@@ -934,9 +944,9 @@ function PollsPanel({
     setSaving(true);
     try {
       if (editingPollId) {
-        await updatePoll(roomId, editingPollId, { title: pollTitle.trim(), options: validOptions });
+        await updatePoll(roomId, editingPollId, { title: pollTitle.trim(), options: validOptions, allowMultiple: pollAllowMultiple });
       } else {
-        await createPoll(roomId, pollTitle.trim(), validOptions, polls.length);
+        await createPoll(roomId, pollTitle.trim(), validOptions, polls.length, pollAllowMultiple);
       }
       resetForm();
     } finally {
@@ -952,20 +962,26 @@ function PollsPanel({
 
   const canAdd = polls.length < 10 && !showForm;
 
-  const statusBadge = (status: Poll["status"]) => {
-    if (status === "active")
+  const statusBadge = (poll: Poll) => {
+    if (poll.status === "active")
       return <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">実施中</span>;
-    if (status === "closed")
+    if (poll.status === "closed")
       return <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">終了</span>;
     return <span className="text-xs bg-rimo-100 text-rimo-600 px-2 py-0.5 rounded-full">下書き</span>;
   };
 
+  const getVoteArr = (v: unknown): number[] => {
+    if (Array.isArray(v)) return v as number[];
+    if (typeof v === "number") return [v];
+    return [];
+  };
+
   const getResults = (poll: Poll) => {
-    const votes = Object.values(poll.votes || {});
-    const total = votes.length;
+    const votesMap = poll.votes || {};
+    const respondents = Object.keys(votesMap).length;
     return poll.options.map((opt, i) => {
-      const count = votes.filter((v) => v === i).length;
-      const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+      const count = Object.values(votesMap).filter((v) => getVoteArr(v).includes(i)).length;
+      const pct = respondents > 0 ? Math.round((count / respondents) * 100) : 0;
       return { opt, count, pct };
     });
   };
@@ -1004,17 +1020,28 @@ function PollsPanel({
             <div className="space-y-2">
               <p className="text-xs text-gray-500">選択肢（2〜5個、入力した分だけ表示）</p>
               {pollOptions.map((opt, i) => (
-                <input
-                  key={i}
-                  type="text"
-                  value={opt}
-                  onChange={(e) => handleOptionChange(i, e.target.value)}
-                  placeholder={`選択肢 ${i + 1}${i < 2 ? "（必須）" : "（任意）"}`}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 bg-white"
-                  required={i < 2}
-                />
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 w-5 flex-shrink-0">{CIRCLE_NUMS[i]}</span>
+                  <input
+                    type="text"
+                    value={opt}
+                    onChange={(e) => handleOptionChange(i, e.target.value)}
+                    placeholder={i < 2 ? "必須" : "任意"}
+                    className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 bg-white"
+                    required={i < 2}
+                  />
+                </div>
               ))}
             </div>
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={pollAllowMultiple}
+                onChange={(e) => setPollAllowMultiple(e.target.checked)}
+                className="w-4 h-4 accent-rimo-500"
+              />
+              複数選択を許可する
+            </label>
             <div className="flex gap-2">
               <button
                 type="submit"
@@ -1045,7 +1072,7 @@ function PollsPanel({
           <div className="space-y-3">
             {polls.map((poll) => {
               const results = getResults(poll);
-              const totalVotes = Object.values(poll.votes || {}).length;
+              const respondents = Object.keys(poll.votes || {}).length;
               const isEditing = editingPollId === poll.id && showForm;
 
               return (
@@ -1063,8 +1090,11 @@ function PollsPanel({
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-800 leading-snug">{poll.title}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        {statusBadge(poll.status)}
-                        <span className="text-xs text-gray-400">{totalVotes}票</span>
+                        {statusBadge(poll)}
+                        {poll.allowMultiple && (
+                          <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">複数選択</span>
+                        )}
+                        <span className="text-xs text-gray-400">{respondents}人回答</span>
                       </div>
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
@@ -1092,6 +1122,14 @@ function PollsPanel({
                           終了
                         </button>
                       )}
+                      {poll.status === "closed" && (
+                        <button
+                          onClick={() => activatePoll(roomId, poll.id)}
+                          className="px-2 py-1 border border-rimo-200 text-rimo-600 text-xs rounded-lg hover:bg-rimo-50"
+                        >
+                          再開
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           if (confirm(`「${poll.title}」を削除しますか？`)) deletePoll(roomId, poll.id);
@@ -1108,9 +1146,11 @@ function PollsPanel({
                     {results.map(({ opt, count, pct }, i) => (
                       <div key={i}>
                         <div className="flex items-center justify-between text-xs mb-0.5">
-                          <span className="text-gray-700 truncate max-w-xs">{opt}</span>
+                          <span className="text-gray-700 truncate max-w-xs">
+                            <span className="text-gray-400 mr-1">{CIRCLE_NUMS[i]}</span>{opt}
+                          </span>
                           <span className="text-gray-500 flex-shrink-0 ml-2">
-                            {count}票 {totalVotes > 0 && <span className="text-gray-400">({pct}%)</span>}
+                            {count}票 {respondents > 0 && <span className="text-gray-400">({pct}%)</span>}
                           </span>
                         </div>
                         {(poll.status === "active" || poll.status === "closed") && (

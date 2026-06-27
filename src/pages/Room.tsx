@@ -285,6 +285,8 @@ export default function Room() {
 
 // ---- 投票カード ----
 
+const CIRCLE_NUMS = ["①", "②", "③", "④", "⑤"];
+
 interface PollCardProps {
   poll: Poll;
   roomId: string;
@@ -292,19 +294,33 @@ interface PollCardProps {
 }
 
 function PollCard({ poll, roomId, sessionId }: PollCardProps) {
-  const myVote = poll.votes?.[sessionId] ?? null;
-  const hasVoted = myVote !== null && myVote !== undefined;
-  const [selected, setSelected] = useState<number | null>(null);
+  const rawVote = poll.votes?.[sessionId];
+  const myVotes: number[] = Array.isArray(rawVote) ? rawVote : typeof rawVote === "number" ? [rawVote] : [];
+  const hasVoted = myVotes.length > 0;
+  const [selected, setSelected] = useState<number[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
-  const totalVotes = Object.values(poll.votes || {}).length;
-  const getCount = (i: number) => Object.values(poll.votes || {}).filter((v) => v === i).length;
-  const getPct = (i: number) => totalVotes > 0 ? Math.round((getCount(i) / totalVotes) * 100) : 0;
+  const respondents = Object.keys(poll.votes || {}).length;
+  const getCount = (i: number) =>
+    Object.values(poll.votes || {}).filter((v) => {
+      const arr = Array.isArray(v) ? v : typeof v === "number" ? [v] : [];
+      return arr.includes(i);
+    }).length;
+  const getPct = (i: number) => respondents > 0 ? Math.round((getCount(i) / respondents) * 100) : 0;
 
   const showResults = hasVoted || poll.status === "closed";
+  const allowMultiple = poll.allowMultiple ?? false;
+
+  const toggleSelect = (i: number) => {
+    if (allowMultiple) {
+      setSelected((prev) => prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]);
+    } else {
+      setSelected([i]);
+    }
+  };
 
   const handleVote = async () => {
-    if (selected === null || submitting) return;
+    if (selected.length === 0 || submitting) return;
     setSubmitting(true);
     try {
       await castVote(roomId, poll.id, sessionId, selected);
@@ -319,7 +335,10 @@ function PollCard({ poll, roomId, sessionId }: PollCardProps) {
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${poll.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
           {poll.status === "active" ? "投票受付中" : "投票終了"}
         </span>
-        <span className="text-xs text-gray-400">{totalVotes}票</span>
+        {allowMultiple && (
+          <span className="text-xs text-gray-400">複数選択可</span>
+        )}
+        <span className="text-xs text-gray-400">{respondents}人回答</span>
       </div>
       <div className="px-4 pb-4 pt-2">
         <p className="text-sm font-semibold text-gray-800 mb-3">{poll.title}</p>
@@ -329,11 +348,12 @@ function PollCard({ poll, roomId, sessionId }: PollCardProps) {
           <div className="space-y-2">
             {poll.options.map((opt, i) => {
               const pct = getPct(i);
-              const isMyVote = myVote === i;
+              const isMyVote = myVotes.includes(i);
               return (
                 <div key={i}>
                   <div className="flex items-center justify-between text-xs mb-0.5">
                     <span className={`truncate max-w-xs ${isMyVote ? "font-semibold text-rimo-700" : "text-gray-700"}`}>
+                      <span className="text-gray-400 mr-1">{CIRCLE_NUMS[i]}</span>
                       {isMyVote && "✓ "}{opt}
                     </span>
                     <span className="text-gray-500 flex-shrink-0 ml-2">{pct}%</span>
@@ -347,36 +367,37 @@ function PollCard({ poll, roomId, sessionId }: PollCardProps) {
                 </div>
               );
             })}
-            {hasVoted && (
-              <p className="text-xs text-gray-400 mt-2">投票済みです</p>
-            )}
+            {hasVoted && <p className="text-xs text-gray-400 mt-2">投票済みです</p>}
           </div>
         ) : (
           /* 投票フォーム */
           <div className="space-y-2">
-            {poll.options.map((opt, i) => (
-              <label
-                key={i}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border cursor-pointer transition-colors ${
-                  selected === i
-                    ? "border-rimo-400 bg-rimo-50"
-                    : "border-gray-200 hover:border-rimo-200 hover:bg-rimo-50/30"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name={`poll-${poll.id}`}
-                  value={i}
-                  checked={selected === i}
-                  onChange={() => setSelected(i)}
-                  className="accent-rimo-500"
-                />
-                <span className="text-sm text-gray-800">{opt}</span>
-              </label>
-            ))}
+            {poll.options.map((opt, i) => {
+              const isSelected = selected.includes(i);
+              return (
+                <label
+                  key={i}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border cursor-pointer transition-colors ${
+                    isSelected ? "border-rimo-400 bg-rimo-50" : "border-gray-200 hover:border-rimo-200 hover:bg-rimo-50/30"
+                  }`}
+                >
+                  <input
+                    type={allowMultiple ? "checkbox" : "radio"}
+                    name={`poll-${poll.id}`}
+                    value={i}
+                    checked={isSelected}
+                    onChange={() => toggleSelect(i)}
+                    className="accent-rimo-500"
+                  />
+                  <span className="text-sm text-gray-800">
+                    <span className="text-gray-400 mr-1">{CIRCLE_NUMS[i]}</span>{opt}
+                  </span>
+                </label>
+              );
+            })}
             <button
               onClick={handleVote}
-              disabled={selected === null || submitting}
+              disabled={selected.length === 0 || submitting}
               className="mt-2 w-full py-2.5 bg-rimo-500 text-white text-sm font-medium rounded-xl hover:bg-rimo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? "送信中..." : "投票する"}
