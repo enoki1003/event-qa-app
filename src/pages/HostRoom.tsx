@@ -1336,6 +1336,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
               placeholder="無料相談会の予約はこちら"
               className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm bg-white"
             />
+            <LabelLengthHint label={settings.ctaLabel} placeholder="無料相談会の予約はこちら" />
           </div>
           <div>
             <label className="text-xs text-gray-500">遷移先URL</label>
@@ -1364,6 +1365,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
               placeholder="アンケートに回答する"
               className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm bg-white"
             />
+            <LabelLengthHint label={settings.surveyLabel} placeholder="アンケートに回答する" />
           </div>
           <div>
             <label className="text-xs text-gray-500">遷移先URL</label>
@@ -1400,5 +1402,21 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
         {saved && <span className="text-sm text-rimo-600">保存しました</span>}
       </div>
     </form>
+  );
+}
+
+// ---- ボタン文言の長さヒント ----
+// モバイル幅（375px）で text-sm font-semibold 日本語 ≈ 20文字が1行の目安
+const LABEL_WRAP_THRESHOLD = 20;
+
+function LabelLengthHint({ label, placeholder }: { label: string; placeholder: string }) {
+  const text = label || placeholder;
+  const len = text.length;
+  const over = len > LABEL_WRAP_THRESHOLD;
+  return (
+    <p className={`text-xs mt-1 flex items-center gap-1 ${over ? "text-brand-orange-500" : "text-gray-400"}`}>
+      <span>{len}文字</span>
+      {over && <span>— スマホで折り返す可能性があります</span>}
+    </p>
   );
 }

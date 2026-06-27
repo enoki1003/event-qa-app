@@ -5,7 +5,6 @@ import { useQuestions, submitQuestion } from "../hooks/useQuestions";
 import { useSession } from "../hooks/useSession";
 import { recordVisit, updateVisitorInfo } from "../hooks/useVisitors";
 import { usePolls, castVote } from "../hooks/usePolls";
-import { submitRating } from "../hooks/useRatings";
 import type { AuthorMode, Poll } from "../types";
 
 const STORAGE_KEY = "qa_author_info";
@@ -48,10 +47,6 @@ export default function Room() {
   const [submitError, setSubmitError] = useState("");
   const [sortOrder, setSortOrder] = useState<"new" | "old">("new");
 
-  // 退出後アンケート
-  const [rated, setRated] = useState(false);
-  const [hoverScore, setHoverScore] = useState(0);
-
   // 回答済み通知
   const prevAnsweredRef = useRef<Set<string> | null>(null);
   const [notification, setNotification] = useState<{ id: string; text: string } | null>(null);
@@ -64,13 +59,6 @@ export default function Room() {
   useEffect(() => {
     if (room?.id) recordVisit(room.id, sessionId);
   }, [room?.id, sessionId]);
-
-  // セッションストレージから評価済み状態を復元
-  useEffect(() => {
-    if (room?.id) {
-      setRated(!!sessionStorage.getItem(`rated_${room.id}`));
-    }
-  }, [room?.id]);
 
   // 自分の質問が回答済みになったら通知
   useEffect(() => {
@@ -105,75 +93,41 @@ export default function Room() {
   }
 
   if (!room.isOpen) {
-    const handleRate = async (score: number) => {
-      await submitRating(room.id, sessionId, score);
-      sessionStorage.setItem(`rated_${room.id}`, "1");
-      setRated(true);
-    };
-
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="flex justify-center mb-6">
             <img src="/rimo_logo.svg" alt="Rimo" className="h-6 opacity-60" />
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 text-center space-y-5">
-            {!rated ? (
-              <>
-                <p className="font-semibold text-gray-800">本日はご参加いただきありがとうございました！</p>
-                <div>
-                  <p className="text-sm text-gray-500 mb-4">ウェビナーはいかがでしたか？</p>
-                  <div className="flex justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => handleRate(s)}
-                        onMouseEnter={() => setHoverScore(s)}
-                        onMouseLeave={() => setHoverScore(0)}
-                        className={`text-3xl transition-transform hover:scale-125 ${
-                          s <= hoverScore ? "text-brand-yellow-500" : "text-gray-200"
-                        }`}
-                      >
-                        ★
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  onClick={() => { sessionStorage.setItem(`rated_${room.id}`, "skipped"); setRated(true); }}
-                  className="text-xs text-gray-300 hover:text-gray-500"
-                >
-                  スキップ
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="font-semibold text-gray-800">本日はご参加いただき誠にありがとうございました！</p>
-                {room.settings.ctaUrl ? (
-                  <a
-                    href={room.settings.ctaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: "#F18900" }}
-                  >
-                    {room.settings.ctaLabel || "無料相談の予約はこちら"}
-                  </a>
-                ) : (
-                  <p className="text-sm text-gray-400">またのご参加をお待ちしています。</p>
-                )}
-                {room.settings.surveyUrl && (
-                  <a
-                    href={room.settings.surveyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: "#F7AF00" }}
-                  >
-                    {room.settings.surveyLabel || "アンケートに回答する"}
-                  </a>
-                )}
-              </>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 text-center space-y-4">
+            <p className="font-semibold text-gray-800">
+              本日はご参加いただき<br />
+              誠にありがとうございました！
+            </p>
+            {room.settings.ctaUrl && (
+              <a
+                href={room.settings.ctaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#F18900" }}
+              >
+                {room.settings.ctaLabel || "無料相談の予約はこちら"}
+              </a>
+            )}
+            {room.settings.surveyUrl && (
+              <a
+                href={room.settings.surveyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#F7AF00" }}
+              >
+                {room.settings.surveyLabel || "アンケートに回答する"}
+              </a>
+            )}
+            {!room.settings.ctaUrl && !room.settings.surveyUrl && (
+              <p className="text-sm text-gray-400">またのご参加をお待ちしています。</p>
             )}
           </div>
         </div>
