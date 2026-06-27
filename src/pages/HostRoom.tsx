@@ -752,7 +752,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
             )}
             {statusBadge(q.status)}
             {q.isAnswered && (
-              <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">
                 回答済み
               </span>
             )}
@@ -1081,7 +1081,7 @@ function PollsPanel({
                   key={poll.id}
                   className={`p-4 rounded-xl border transition-colors ${poll.isHidden ? "opacity-50" : ""} ${
                     poll.status === "active"
-                      ? "bg-green-50 border-green-200"
+                      ? "bg-rimo-50 border-rimo-200"
                       : poll.status === "closed"
                       ? "bg-gray-50 border-gray-100"
                       : "bg-white border-gray-200"

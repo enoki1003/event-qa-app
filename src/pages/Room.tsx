@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useRoomByCode } from "../hooks/useRoom";
 import { useQuestions, submitQuestion } from "../hooks/useQuestions";
 import { useSession } from "../hooks/useSession";
 import { recordVisit, updateVisitorInfo } from "../hooks/useVisitors";
 import { usePolls, castVote } from "../hooks/usePolls";
+import { submitRating } from "../hooks/useRatings";
 import type { AuthorMode, Poll } from "../types";
 
 const STORAGE_KEY = "qa_author_info";
@@ -47,6 +48,14 @@ export default function Room() {
   const [submitError, setSubmitError] = useState("");
   const [sortOrder, setSortOrder] = useState<"new" | "old">("new");
 
+  // 退出後アンケート
+  const [rated, setRated] = useState(false);
+  const [hoverScore, setHoverScore] = useState(0);
+
+  // 回答済み通知
+  const prevAnsweredRef = useRef<Set<string> | null>(null);
+  const [notification, setNotification] = useState<{ id: string; text: string } | null>(null);
+
   useEffect(() => {
     saveAuthorInfo(companyName, authorName);
   }, [companyName, authorName]);
@@ -55,6 +64,32 @@ export default function Room() {
   useEffect(() => {
     if (room?.id) recordVisit(room.id, sessionId);
   }, [room?.id, sessionId]);
+
+  // セッションストレージから評価済み状態を復元
+  useEffect(() => {
+    if (room?.id) {
+      setRated(!!sessionStorage.getItem(`rated_${room.id}`));
+    }
+  }, [room?.id]);
+
+  // 自分の質問が回答済みになったら通知
+  useEffect(() => {
+    if (!questions.length) return;
+    const myAnswered = questions.filter(
+      (q) => q.browserSessionId === sessionId && q.isAnswered
+    );
+    const currentIds = new Set(myAnswered.map((q) => q.id));
+    if (prevAnsweredRef.current === null) {
+      prevAnsweredRef.current = currentIds;
+      return;
+    }
+    const newlyAnswered = myAnswered.find((q) => !prevAnsweredRef.current!.has(q.id));
+    if (newlyAnswered) {
+      setNotification({ id: newlyAnswered.id, text: newlyAnswered.text });
+      setTimeout(() => setNotification(null), 8000);
+    }
+    prevAnsweredRef.current = currentIds;
+  }, [questions, sessionId]);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="text-gray-400">読み込み中...</div></div>;
@@ -70,10 +105,78 @@ export default function Room() {
   }
 
   if (!room.isOpen) {
+    const handleRate = async (score: number) => {
+      await submitRating(room.id, sessionId, score);
+      sessionStorage.setItem(`rated_${room.id}`, "1");
+      setRated(true);
+    };
+
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
-        <p className="text-gray-600 font-medium">本日はご参加いただき誠にありがとうございました！</p>
-        <button onClick={() => navigate("/")} className="text-rimo-600 hover:underline text-sm">トップに戻る</button>
+      <div className="min-h-screen bg-[#f5f5f5] flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-sm">
+          <div className="flex justify-center mb-6">
+            <img src="/rimo_logo.svg" alt="Rimo" className="h-6 opacity-60" />
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 text-center space-y-5">
+            {!rated ? (
+              <>
+                <p className="font-semibold text-gray-800">本日はご参加いただきありがとうございました！</p>
+                <div>
+                  <p className="text-sm text-gray-500 mb-4">ウェビナーはいかがでしたか？</p>
+                  <div className="flex justify-center gap-2">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => handleRate(s)}
+                        onMouseEnter={() => setHoverScore(s)}
+                        onMouseLeave={() => setHoverScore(0)}
+                        className={`text-3xl transition-transform hover:scale-125 ${
+                          s <= hoverScore ? "text-brand-yellow-500" : "text-gray-200"
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <button
+                  onClick={() => { sessionStorage.setItem(`rated_${room.id}`, "skipped"); setRated(true); }}
+                  className="text-xs text-gray-300 hover:text-gray-500"
+                >
+                  スキップ
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="font-semibold text-gray-800">本日はご参加いただき誠にありがとうございました！</p>
+                {room.settings.ctaUrl ? (
+                  <a
+                    href={room.settings.ctaUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: "#F18900" }}
+                  >
+                    {room.settings.ctaLabel || "無料相談の予約はこちら"}
+                  </a>
+                ) : (
+                  <p className="text-sm text-gray-400">またのご参加をお待ちしています。</p>
+                )}
+                {room.settings.surveyUrl && (
+                  <a
+                    href={room.settings.surveyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: "#F7AF00" }}
+                  >
+                    {room.settings.surveyLabel || "アンケートに回答する"}
+                  </a>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
@@ -142,6 +245,27 @@ export default function Room() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] pb-8">
+      {/* 回答済み通知バナー */}
+      {notification && (
+        <div className="fixed top-14 left-0 right-0 z-50 flex justify-center px-4 pt-2 pointer-events-none">
+          <div className="bg-white border border-rimo-200 rounded-xl shadow-lg px-4 py-3 max-w-sm w-full pointer-events-auto">
+            <div className="flex items-start gap-3">
+              <span className="text-rimo-500 flex-shrink-0 mt-0.5 text-base">💬</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-rimo-700">あなたの質問が取り上げられました</p>
+                <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">「{notification.text}」</p>
+              </div>
+              <button
+                onClick={() => setNotification(null)}
+                className="text-gray-300 hover:text-gray-500 flex-shrink-0 text-sm leading-none"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
