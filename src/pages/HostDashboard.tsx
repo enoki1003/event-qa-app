@@ -18,6 +18,8 @@ const DEFAULT_SETTINGS: RoomSettings = {
   requireApproval: false,
   showTimestamp: false,
   replyAuthorLabel: "",
+  ctaLabel: "",
+  ctaUrl: "",
 };
 
 interface FormState {
