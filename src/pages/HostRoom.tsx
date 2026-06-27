@@ -323,7 +323,7 @@ export default function HostRoom() {
           onClick={() => setShowQr(false)}
         >
           <div
-            className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4"
+            className="bg-white rounded-xl p-8 flex flex-col items-center gap-4"
             onClick={(e) => e.stopPropagation()}
           >
             <QRCodeSVG value={roomUrl} size={240} />
@@ -385,7 +385,7 @@ export default function HostRoom() {
         {tab === "sessions" && (
           <div className="space-y-4">
             {/* 受付コントロール */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
               <p className="text-sm font-medium text-gray-700 mb-3">受付コントロール</p>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -412,7 +412,7 @@ export default function HostRoom() {
             </div>
 
             {/* セッション一覧 */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-medium text-gray-700">セッション一覧</p>
                 <button
@@ -583,7 +583,7 @@ export default function HostRoom() {
         {tab === "questions" && (
           <div className="space-y-3">
             {/* セッションタブ */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="flex overflow-x-auto border-b border-gray-100">
                 {/* 全ての質問 */}
                 <button
@@ -737,7 +737,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
 
   return (
     <div
-      className={`bg-white rounded-2xl border shadow-sm p-4 ${q.isHidden ? "opacity-50" : ""} ${
+      className={`bg-white rounded-xl border shadow-sm p-4 ${q.isHidden ? "opacity-50" : ""} ${
         q.status === "pending" ? "border-gray-200" : "border-gray-100"
       }`}
     >
@@ -989,7 +989,7 @@ function PollsPanel({
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium text-gray-700">
             投票一覧
@@ -1225,7 +1225,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
     setSettings((s) => ({ ...s, ...patch }));
 
   return (
-    <form onSubmit={handleSave} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+    <form onSubmit={handleSave} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
       <h2 className="font-semibold text-gray-800">イベント設定</h2>
 
       <div>

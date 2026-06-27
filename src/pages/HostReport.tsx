@@ -95,7 +95,7 @@ export default function HostReport() {
             { label: "承認済み", value: approvedQuestions, unit: "件" },
             { label: "回答済み", value: answeredQuestions, unit: "件" },
           ].map((item) => (
-            <div key={item.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            <div key={item.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
               <p className="text-xs text-gray-400">{item.label}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {item.value}
@@ -107,7 +107,7 @@ export default function HostReport() {
 
         {/* セッション別質問数 */}
         {sessions.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
             <h2 className="font-semibold text-gray-800 mb-4">セッション別 質問数</h2>
             <div className="space-y-3">
               {sessions.map((session) => {
@@ -151,7 +151,7 @@ export default function HostReport() {
         )}
 
         {/* 参加者一覧 */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
           <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
             <h2 className="font-semibold text-gray-800">
               参加者一覧

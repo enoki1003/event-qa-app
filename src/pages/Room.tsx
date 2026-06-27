@@ -72,7 +72,6 @@ export default function Room() {
   if (!room.isOpen) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
-        <div className="text-4xl">🔒</div>
         <p className="text-gray-600 font-medium">本日はご参加いただき誠にありがとうございました！</p>
         <button onClick={() => navigate("/")} className="text-rimo-600 hover:underline text-sm">トップに戻る</button>
       </div>
@@ -142,7 +141,7 @@ export default function Room() {
   const activePolls = polls.filter((p) => !p.isHidden && (p.status === "active" || p.status === "closed"));
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
+    <div className="min-h-screen bg-[#f5f5f5] pb-8">
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
@@ -163,7 +162,7 @@ export default function Room() {
             href={settings.ctaUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full py-3 text-white text-sm font-semibold rounded-2xl text-center transition-opacity hover:opacity-90 shadow-sm"
+            className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90 shadow-sm"
             style={{ backgroundColor: "#F18900" }}
           >
             {settings.ctaLabel || "詳細・お申し込みはこちら"}
@@ -176,7 +175,7 @@ export default function Room() {
             href={settings.surveyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full py-3 text-white text-sm font-semibold rounded-2xl text-center transition-opacity hover:opacity-90 shadow-sm"
+            className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90 shadow-sm"
             style={{ backgroundColor: "#F7AF00" }}
           >
             {settings.surveyLabel || "アンケートに回答する"}
@@ -185,12 +184,12 @@ export default function Room() {
 
         {/* セッションバナー */}
         {(sessionBannerTitle || sessionBannerDesc) && (
-          <div className="bg-rimo-50 border border-rimo-100 rounded-2xl px-4 py-3">
+          <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
             {sessionBannerTitle && (
-              <p className="text-sm font-semibold text-rimo-700">▶ {sessionBannerTitle}</p>
+              <p className="text-sm font-semibold text-gray-800">▶ {sessionBannerTitle}</p>
             )}
             {sessionBannerDesc && (
-              <p className="text-xs text-rimo-600 mt-1">{sessionBannerDesc}</p>
+              <p className="text-xs text-gray-600 mt-1">{sessionBannerDesc}</p>
             )}
           </div>
         )}
@@ -201,7 +200,7 @@ export default function Room() {
         ))}
 
         {/* 投稿フォーム */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
           <div className="px-4 pt-4 pb-1">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">質問を投稿する</p>
           </div>
@@ -225,7 +224,7 @@ export default function Room() {
             <div className="flex items-center justify-between mt-2">
               <span className="text-xs text-gray-400">{text.length}/1000</span>
               <button type="submit" disabled={!canSubmit}
-                className="px-5 py-2 bg-rimo-500 text-white text-sm font-medium rounded-lg hover:bg-rimo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                className="px-5 py-2 bg-rimo-500 text-white text-sm font-medium rounded-full hover:bg-rimo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                 {submitting ? "送信中..." : "投稿する"}
               </button>
             </div>
@@ -239,7 +238,7 @@ export default function Room() {
         </div>
 
         {/* 質問一覧 */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
               質問一覧 {sorted.length > 0 && <span className="text-gray-400">({sorted.length})</span>}
@@ -268,7 +267,7 @@ export default function Room() {
                   .sort((a, b) => a.createdAt - b.createdAt);
 
                 return (
-                  <div key={q.id} className={`border rounded-xl px-3 py-2 ${q.isAnswered ? "opacity-60" : ""} ${isPending ? "bg-gray-50 border-gray-200" : "bg-white border-gray-200"}`}>
+                  <div key={q.id} className={`border rounded-lg px-3 py-2 ${q.isAnswered ? "opacity-60" : ""} ${isPending ? "bg-gray-50 border-gray-200" : "bg-white border-gray-200"}`}>
                     <p className="text-sm text-gray-800 leading-relaxed">{q.text}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-1.5">
                       {byLine && <span className="text-xs text-gray-400">{byLine}</span>}
@@ -356,7 +355,7 @@ function PollCard({ poll, roomId, sessionId }: PollCardProps) {
   };
 
   return (
-    <div className={`bg-white rounded-2xl border shadow-sm ${poll.status === "active" ? "border-rimo-200" : "border-gray-100"}`}>
+    <div className={`bg-white rounded-xl border shadow-sm ${poll.status === "active" ? "border-rimo-200" : "border-gray-100"}`}>
       <div className="px-4 pt-4 pb-1 flex items-center gap-2">
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${poll.status === "active" ? "bg-rimo-100 text-rimo-700" : "bg-gray-100 text-gray-500"}`}>
           {poll.status === "active" ? "投票受付中" : "投票終了"}
@@ -424,7 +423,7 @@ function PollCard({ poll, roomId, sessionId }: PollCardProps) {
             <button
               onClick={handleVote}
               disabled={selected.length === 0 || submitting}
-              className="mt-2 w-full py-2.5 bg-rimo-500 text-white text-sm font-medium rounded-xl hover:bg-rimo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="mt-2 w-full py-2.5 bg-rimo-500 text-white text-sm font-medium rounded-full hover:bg-rimo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? "送信中..." : "投票する"}
             </button>

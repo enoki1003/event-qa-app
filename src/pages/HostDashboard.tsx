@@ -130,7 +130,7 @@ export default function HostDashboard() {
         {/* 新規作成モーダル */}
         {showCreate && (
           <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
               <h2 className="font-bold text-gray-900 mb-4">新規イベント作成</h2>
               <form onSubmit={handleSave} className="space-y-4">
                 <div>
@@ -191,7 +191,7 @@ export default function HostDashboard() {
         {/* QRモーダル */}
         {qrTarget && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setQrTarget(null)}>
-            <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white rounded-xl p-8 flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
               <QRCodeSVG value={qrTarget.url} size={240} />
               {/* 保存用の非表示Canvas */}
               <div ref={qrCanvasRef} style={{ display: "none" }}>
@@ -227,7 +227,7 @@ export default function HostDashboard() {
         ) : (
           <div className="space-y-3">
             {filteredRooms.map((room) => (
-              <div key={room.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+              <div key={room.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
                 <div className="flex items-start gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
