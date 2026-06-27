@@ -21,7 +21,15 @@ import {
   deleteSession,
   updateRoomSettings,
 } from "../hooks/useRooms";
-import type { AuthorMode, Question, RoomSettings, Session } from "../types";
+import {
+  usePolls,
+  createPoll,
+  updatePoll,
+  activatePoll,
+  closePoll,
+  deletePoll,
+} from "../hooks/usePolls";
+import type { AuthorMode, Poll, Question, RoomSettings, Session } from "../types";
 
 const AUTHOR_OPTIONS: { value: AuthorMode; label: string }[] = [
   { value: "anonymous", label: "匿名" },
@@ -92,12 +100,20 @@ export default function HostRoom() {
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [newSessionDescription, setNewSessionDescription] = useState("");
   const [addingSession, setAddingSession] = useState(false);
-  const [tab, setTab] = useState<"questions" | "sessions" | "settings">("questions");
+  const [tab, setTab] = useState<"questions" | "polls" | "sessions" | "settings">("questions");
   // session inline edit state
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editSessionTitle, setEditSessionTitle] = useState("");
   const [editSessionDescription, setEditSessionDescription] = useState("");
   const [savingSessionEdit, setSavingSessionEdit] = useState(false);
+
+  const { polls } = usePolls(roomId ?? "");
+  // poll management state
+  const [showPollForm, setShowPollForm] = useState(false);
+  const [editingPollId, setEditingPollId] = useState<string | null>(null);
+  const [pollTitle, setPollTitle] = useState("");
+  const [pollOptions, setPollOptions] = useState(["", "", "", "", ""]);
+  const [savingPoll, setSavingPoll] = useState(false);
 
   useEffect(() => {
     if (!isHostAuth()) navigate("/host");
@@ -282,7 +298,7 @@ export default function HostRoom() {
 
         {/* Tabs */}
         <div className="max-w-4xl mx-auto px-4 flex gap-4 border-t border-gray-50">
-          {(["questions", "sessions", "settings"] as const).map((t) => (
+          {(["questions", "polls", "sessions", "settings"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -292,7 +308,7 @@ export default function HostRoom() {
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
-              {t === "questions" ? "質問" : t === "sessions" ? "セッション" : "設定"}
+              {t === "questions" ? "質問" : t === "polls" ? "投票" : t === "sessions" ? "セッション" : "設定"}
             </button>
           ))}
         </div>
@@ -338,6 +354,24 @@ export default function HostRoom() {
       )}
 
       <div className="max-w-4xl mx-auto px-4 pt-4">
+        {/* ---- 投票タブ ---- */}
+        {tab === "polls" && (
+          <PollsPanel
+            roomId={room.id}
+            polls={polls}
+            showForm={showPollForm}
+            setShowForm={setShowPollForm}
+            editingPollId={editingPollId}
+            setEditingPollId={setEditingPollId}
+            pollTitle={pollTitle}
+            setPollTitle={setPollTitle}
+            pollOptions={pollOptions}
+            setPollOptions={setPollOptions}
+            saving={savingPoll}
+            setSaving={setSavingPoll}
+          />
+        )}
+
         {/* ---- 設定タブ ---- */}
         {tab === "settings" && (
           <SettingsPanel room={room} onSaved={() => {}} />
@@ -849,6 +883,253 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
           </div>
         </form>
       )}
+    </div>
+  );
+}
+
+// ---- 投票パネル ----
+
+interface PollsPanelProps {
+  roomId: string;
+  polls: Poll[];
+  showForm: boolean;
+  setShowForm: (v: boolean) => void;
+  editingPollId: string | null;
+  setEditingPollId: (v: string | null) => void;
+  pollTitle: string;
+  setPollTitle: (v: string) => void;
+  pollOptions: string[];
+  setPollOptions: (v: string[]) => void;
+  saving: boolean;
+  setSaving: (v: boolean) => void;
+}
+
+function PollsPanel({
+  roomId, polls,
+  showForm, setShowForm,
+  editingPollId, setEditingPollId,
+  pollTitle, setPollTitle,
+  pollOptions, setPollOptions,
+  saving, setSaving,
+}: PollsPanelProps) {
+  const resetForm = () => {
+    setPollTitle("");
+    setPollOptions(["", "", "", "", ""]);
+    setShowForm(false);
+    setEditingPollId(null);
+  };
+
+  const startEdit = (poll: Poll) => {
+    setEditingPollId(poll.id);
+    setPollTitle(poll.title);
+    const opts = [...poll.options, "", "", "", "", ""].slice(0, 5);
+    setPollOptions(opts);
+    setShowForm(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const validOptions = pollOptions.filter((o) => o.trim());
+    if (validOptions.length < 2) return;
+    setSaving(true);
+    try {
+      if (editingPollId) {
+        await updatePoll(roomId, editingPollId, { title: pollTitle.trim(), options: validOptions });
+      } else {
+        await createPoll(roomId, pollTitle.trim(), validOptions, polls.length);
+      }
+      resetForm();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleOptionChange = (idx: number, val: string) => {
+    const next = [...pollOptions];
+    next[idx] = val;
+    setPollOptions(next);
+  };
+
+  const canAdd = polls.length < 10 && !showForm;
+
+  const statusBadge = (status: Poll["status"]) => {
+    if (status === "active")
+      return <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">実施中</span>;
+    if (status === "closed")
+      return <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">終了</span>;
+    return <span className="text-xs bg-rimo-100 text-rimo-600 px-2 py-0.5 rounded-full">下書き</span>;
+  };
+
+  const getResults = (poll: Poll) => {
+    const votes = Object.values(poll.votes || {});
+    const total = votes.length;
+    return poll.options.map((opt, i) => {
+      const count = votes.filter((v) => v === i).length;
+      const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+      return { opt, count, pct };
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-medium text-gray-700">
+            投票一覧
+            <span className="text-xs text-gray-400 ml-2">{polls.length}/10</span>
+          </p>
+          {canAdd && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="text-xs text-rimo-600 hover:underline"
+            >
+              ＋ 投票を追加
+            </button>
+          )}
+        </div>
+
+        {/* 作成/編集フォーム */}
+        {showForm && (
+          <form onSubmit={handleSave} className="mb-4 p-4 bg-gray-50 rounded-xl space-y-3">
+            <p className="text-xs font-medium text-gray-600">{editingPollId ? "投票を編集" : "新しい投票"}</p>
+            <input
+              type="text"
+              value={pollTitle}
+              onChange={(e) => setPollTitle(e.target.value)}
+              placeholder="質問（例: 今後のウェビナーで興味があるテーマは？）"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 bg-white"
+              required
+              autoFocus
+            />
+            <div className="space-y-2">
+              <p className="text-xs text-gray-500">選択肢（2〜5個、入力した分だけ表示）</p>
+              {pollOptions.map((opt, i) => (
+                <input
+                  key={i}
+                  type="text"
+                  value={opt}
+                  onChange={(e) => handleOptionChange(i, e.target.value)}
+                  placeholder={`選択肢 ${i + 1}${i < 2 ? "（必須）" : "（任意）"}`}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 bg-white"
+                  required={i < 2}
+                />
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={saving || pollOptions.filter((o) => o.trim()).length < 2}
+                className="px-3 py-2 bg-rimo-500 text-white text-xs rounded-lg hover:bg-rimo-600 disabled:opacity-40"
+              >
+                {saving ? "保存中..." : editingPollId ? "更新" : "作成"}
+              </button>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="px-3 py-2 border border-gray-200 text-gray-500 text-xs rounded-lg hover:bg-gray-50"
+              >
+                キャンセル
+              </button>
+            </div>
+          </form>
+        )}
+
+        {polls.length === 0 && !showForm ? (
+          <p className="text-sm text-gray-400 text-center py-6">
+            投票がありません<br />
+            <button onClick={() => setShowForm(true)} className="mt-2 text-rimo-600 hover:underline text-xs">
+              最初の投票を作成する
+            </button>
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {polls.map((poll) => {
+              const results = getResults(poll);
+              const totalVotes = Object.values(poll.votes || {}).length;
+              const isEditing = editingPollId === poll.id && showForm;
+
+              return (
+                <div
+                  key={poll.id}
+                  className={`p-4 rounded-xl border transition-colors ${
+                    poll.status === "active"
+                      ? "bg-green-50 border-green-200"
+                      : poll.status === "closed"
+                      ? "bg-gray-50 border-gray-100"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 leading-snug">{poll.title}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {statusBadge(poll.status)}
+                        <span className="text-xs text-gray-400">{totalVotes}票</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 flex-shrink-0">
+                      {poll.status === "draft" && !isEditing && (
+                        <button
+                          onClick={() => startEdit(poll)}
+                          className="px-2 py-1 border border-gray-200 text-gray-500 text-xs rounded-lg hover:bg-gray-100"
+                        >
+                          編集
+                        </button>
+                      )}
+                      {poll.status === "draft" && (
+                        <button
+                          onClick={() => activatePoll(roomId, poll.id)}
+                          className="px-2 py-1 bg-rimo-500 text-white text-xs rounded-lg hover:bg-rimo-600"
+                        >
+                          開始
+                        </button>
+                      )}
+                      {poll.status === "active" && (
+                        <button
+                          onClick={() => closePoll(roomId, poll.id)}
+                          className="px-2 py-1 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
+                        >
+                          終了
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (confirm(`「${poll.title}」を削除しますか？`)) deletePoll(roomId, poll.id);
+                        }}
+                        className="px-2 py-1 border border-red-100 text-red-400 text-xs rounded-lg hover:bg-red-50"
+                      >
+                        削除
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 選択肢と結果 */}
+                  <div className="space-y-1.5 mt-3">
+                    {results.map(({ opt, count, pct }, i) => (
+                      <div key={i}>
+                        <div className="flex items-center justify-between text-xs mb-0.5">
+                          <span className="text-gray-700 truncate max-w-xs">{opt}</span>
+                          <span className="text-gray-500 flex-shrink-0 ml-2">
+                            {count}票 {totalVotes > 0 && <span className="text-gray-400">({pct}%)</span>}
+                          </span>
+                        </div>
+                        {(poll.status === "active" || poll.status === "closed") && (
+                          <div className="w-full bg-gray-100 rounded-full h-1.5">
+                            <div
+                              className="bg-rimo-500 h-1.5 rounded-full transition-all duration-500"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

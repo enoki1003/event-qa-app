@@ -69,3 +69,15 @@ export interface Visitor {
   companyName: string | null;
   authorName: string | null;
 }
+
+export type PollStatus = "draft" | "active" | "closed";
+
+export interface Poll {
+  id: string;
+  title: string;
+  options: string[]; // max 5
+  status: PollStatus;
+  order: number;
+  createdAt: number;
+  votes: Record<string, number>; // browserSessionId -> option index (0-based)
+}

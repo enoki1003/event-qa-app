@@ -4,7 +4,8 @@ import { useRoomByCode } from "../hooks/useRoom";
 import { useQuestions, submitQuestion } from "../hooks/useQuestions";
 import { useSession } from "../hooks/useSession";
 import { recordVisit, updateVisitorInfo } from "../hooks/useVisitors";
-import type { AuthorMode } from "../types";
+import { usePolls, castVote } from "../hooks/usePolls";
+import type { AuthorMode, Poll } from "../types";
 
 const STORAGE_KEY = "qa_author_info";
 
@@ -35,6 +36,7 @@ export default function Room() {
   const sessionId = useSession();
   const { room, loading, error } = useRoomByCode(code ?? "");
   const questions = useQuestions(room?.id ?? "");
+  const { polls } = usePolls(room?.id ?? "");
 
   const saved = loadAuthorInfo();
   const [text, setText] = useState("");
@@ -137,6 +139,7 @@ export default function Room() {
   const sessionBannerTitle = activeSession?.title ?? (activeSessionId === "ALL" ? null : null);
   const sessionBannerDesc = activeSession?.description ?? null;
   const replyLabel = settings.replyAuthorLabel || "登壇者";
+  const activePolls = polls.filter((p) => p.status === "active" || p.status === "closed");
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
@@ -165,6 +168,11 @@ export default function Room() {
             )}
           </div>
         )}
+
+        {/* 投票カード */}
+        {activePolls.map((poll) => (
+          <PollCard key={poll.id} poll={poll} roomId={room.id} sessionId={sessionId} />
+        ))}
 
         {/* 投稿フォーム */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
@@ -270,6 +278,111 @@ export default function Room() {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- 投票カード ----
+
+interface PollCardProps {
+  poll: Poll;
+  roomId: string;
+  sessionId: string;
+}
+
+function PollCard({ poll, roomId, sessionId }: PollCardProps) {
+  const myVote = poll.votes?.[sessionId] ?? null;
+  const hasVoted = myVote !== null && myVote !== undefined;
+  const [selected, setSelected] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const totalVotes = Object.values(poll.votes || {}).length;
+  const getCount = (i: number) => Object.values(poll.votes || {}).filter((v) => v === i).length;
+  const getPct = (i: number) => totalVotes > 0 ? Math.round((getCount(i) / totalVotes) * 100) : 0;
+
+  const showResults = hasVoted || poll.status === "closed";
+
+  const handleVote = async () => {
+    if (selected === null || submitting) return;
+    setSubmitting(true);
+    try {
+      await castVote(roomId, poll.id, sessionId, selected);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className={`bg-white rounded-2xl border shadow-sm ${poll.status === "active" ? "border-rimo-200" : "border-gray-100"}`}>
+      <div className="px-4 pt-4 pb-1 flex items-center gap-2">
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${poll.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+          {poll.status === "active" ? "投票受付中" : "投票終了"}
+        </span>
+        <span className="text-xs text-gray-400">{totalVotes}票</span>
+      </div>
+      <div className="px-4 pb-4 pt-2">
+        <p className="text-sm font-semibold text-gray-800 mb-3">{poll.title}</p>
+
+        {showResults ? (
+          /* 結果表示 */
+          <div className="space-y-2">
+            {poll.options.map((opt, i) => {
+              const pct = getPct(i);
+              const isMyVote = myVote === i;
+              return (
+                <div key={i}>
+                  <div className="flex items-center justify-between text-xs mb-0.5">
+                    <span className={`truncate max-w-xs ${isMyVote ? "font-semibold text-rimo-700" : "text-gray-700"}`}>
+                      {isMyVote && "✓ "}{opt}
+                    </span>
+                    <span className="text-gray-500 flex-shrink-0 ml-2">{pct}%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-500 ${isMyVote ? "bg-rimo-500" : "bg-gray-300"}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            {hasVoted && (
+              <p className="text-xs text-gray-400 mt-2">投票済みです</p>
+            )}
+          </div>
+        ) : (
+          /* 投票フォーム */
+          <div className="space-y-2">
+            {poll.options.map((opt, i) => (
+              <label
+                key={i}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border cursor-pointer transition-colors ${
+                  selected === i
+                    ? "border-rimo-400 bg-rimo-50"
+                    : "border-gray-200 hover:border-rimo-200 hover:bg-rimo-50/30"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name={`poll-${poll.id}`}
+                  value={i}
+                  checked={selected === i}
+                  onChange={() => setSelected(i)}
+                  className="accent-rimo-500"
+                />
+                <span className="text-sm text-gray-800">{opt}</span>
+              </label>
+            ))}
+            <button
+              onClick={handleVote}
+              disabled={selected === null || submitting}
+              className="mt-2 w-full py-2.5 bg-rimo-500 text-white text-sm font-medium rounded-xl hover:bg-rimo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {submitting ? "送信中..." : "投票する"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
