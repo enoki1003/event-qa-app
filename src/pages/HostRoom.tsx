@@ -264,7 +264,7 @@ export default function HostRoom() {
               onClick={() => toggleRoomOpen(room.id, !room.isOpen)}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                 room.isOpen
-                  ? "bg-green-100 text-green-700 hover:bg-green-200"
+                  ? "bg-rimo-100 text-rimo-700 hover:bg-rimo-200"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
@@ -392,8 +392,8 @@ export default function HostRoom() {
                   onClick={handleStartAll}
                   className={`px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
                     activeSessionId === "ALL"
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "border-blue-200 text-blue-600 hover:bg-blue-50"
+                      ? "bg-rimo-500 text-white border-rimo-500"
+                      : "border-rimo-200 text-rimo-600 hover:bg-rimo-50"
                   }`}
                 >
                   全セッション受付
@@ -718,7 +718,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
   const statusBadge = (status: Question["status"]) => {
     if (status === "approved")
       return (
-        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+        <span className="text-xs bg-rimo-100 text-rimo-700 px-2 py-0.5 rounded-full">
           承認済み
         </span>
       );
@@ -791,7 +791,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
         {q.status === "pending" && (
           <button
             onClick={() => onApprove(q)}
-            className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700"
+            className="px-3 py-1.5 bg-rimo-500 text-white text-xs font-medium rounded-lg hover:bg-rimo-600"
           >
             承認
           </button>
@@ -825,7 +825,7 @@ function QuestionCard({ q, roomId, replyLabel, onApprove }: QuestionCardProps) {
             onClick={() => markAnswered(roomId, q.id, !q.isAnswered)}
             className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
               q.isAnswered
-                ? "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                ? "bg-brand-yellow-100 text-brand-yellow-700 border-brand-yellow-100 hover:bg-brand-yellow-100"
                 : "border-gray-200 text-gray-600 hover:bg-gray-50"
             }`}
           >
@@ -965,7 +965,7 @@ function PollsPanel({
 
   const statusBadge = (poll: Poll) => {
     if (poll.status === "active")
-      return <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">実施中</span>;
+      return <span className="text-xs bg-rimo-100 text-rimo-700 px-2 py-0.5 rounded-full font-medium">実施中</span>;
     if (poll.status === "closed")
       return <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">終了</span>;
     return <span className="text-xs bg-rimo-100 text-rimo-600 px-2 py-0.5 rounded-full">下書き</span>;
@@ -1093,7 +1093,7 @@ function PollsPanel({
                       <div className="flex items-center gap-2 mt-1">
                         {statusBadge(poll)}
                         {poll.allowMultiple && (
-                          <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">複数選択</span>
+                          <span className="text-xs bg-gray-100 text-brand-gray px-2 py-0.5 rounded-full">複数選択</span>
                         )}
                         {poll.isHidden && (
                           <span className="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">参加者に非表示</span>
@@ -1397,7 +1397,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
         >
           {saving ? "保存中..." : "保存"}
         </button>
-        {saved && <span className="text-sm text-green-600">保存しました</span>}
+        {saved && <span className="text-sm text-rimo-600">保存しました</span>}
       </div>
     </form>
   );

@@ -90,10 +90,10 @@ export default function HostReport() {
         {/* サマリーカード */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: "アクセス人数", value: visitors.length, unit: "人", color: "indigo" },
-            { label: "総質問数", value: totalQuestions, unit: "件", color: "gray" },
-            { label: "承認済み", value: approvedQuestions, unit: "件", color: "green" },
-            { label: "回答済み", value: answeredQuestions, unit: "件", color: "blue" },
+            { label: "アクセス人数", value: visitors.length, unit: "人" },
+            { label: "総質問数", value: totalQuestions, unit: "件" },
+            { label: "承認済み", value: approvedQuestions, unit: "件" },
+            { label: "回答済み", value: answeredQuestions, unit: "件" },
           ].map((item) => (
             <div key={item.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
               <p className="text-xs text-gray-400">{item.label}</p>

@@ -232,7 +232,7 @@ export default function HostDashboard() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="font-semibold text-gray-900 truncate">{room.title}</h2>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${room.isOpen ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${room.isOpen ? "bg-rimo-100 text-rimo-700" : "bg-gray-100 text-gray-500"}`}>
                         {room.isOpen ? "受付中" : "締切"}
                       </span>
                     </div>

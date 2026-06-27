@@ -1,16 +1,27 @@
 @import "tailwindcss";
 
 @theme {
+  /* Brand red-orange */
   --color-rimo-50: #fff5f0;
   --color-rimo-100: #ffe0d0;
   --color-rimo-200: #ffc0a0;
-  --color-rimo-300: #f18900;
-  --color-rimo-400: #f18900;
   --color-rimo-500: #F14C00;
   --color-rimo-600: #d43d00;
   --color-rimo-700: #b83200;
-  --color-rimo-800: #8a2500;
-  --color-rimo-900: #5c1800;
+  /* Brand orange */
+  --color-brand-orange-50: #fff4e6;
+  --color-brand-orange-100: #ffe4c0;
+  --color-brand-orange-500: #F18900;
+  --color-brand-orange-600: #d47400;
+  /* Brand yellow */
+  --color-brand-yellow-50: #fffbeb;
+  --color-brand-yellow-100: #fff0c2;
+  --color-brand-yellow-500: #F7AF00;
+  --color-brand-yellow-600: #d49300;
+  --color-brand-yellow-700: #b07a00;
+  /* Brand gray */
+  --color-brand-gray: #595649;
+  --color-brand-gray-light: #8a8780;
 }
 
 * {
@@ -19,7 +30,7 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   background: #ffffff;
   -webkit-font-smoothing: antialiased;
   color: #1a1a1a;

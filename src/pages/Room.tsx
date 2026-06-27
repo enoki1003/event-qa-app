@@ -73,7 +73,7 @@ export default function Room() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
         <div className="text-4xl">🔒</div>
-        <p className="text-gray-600 font-medium">このルームは現在締め切られています</p>
+        <p className="text-gray-600 font-medium">本日はご参加いただき誠にありがとうございました！</p>
         <button onClick={() => navigate("/")} className="text-rimo-600 hover:underline text-sm">トップに戻る</button>
       </div>
     );
@@ -230,7 +230,7 @@ export default function Room() {
               </button>
             </div>
             {submitted && (
-              <p className="text-sm text-green-600 mt-2">
+              <p className="text-sm text-rimo-600 mt-2">
                 {settings.requireApproval ? "質問を送信しました（承認後に表示されます）" : "質問を送信しました！"}
               </p>
             )}
@@ -276,7 +276,7 @@ export default function Room() {
                         <span className="text-xs text-rimo-600 bg-rimo-100 px-2 py-0.5 rounded-full">承認待ち</span>
                       )}
                       {q.isAnswered && (
-                        <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">回答済み</span>
+                        <span className="text-xs text-rimo-600 bg-rimo-50 px-2 py-0.5 rounded-full">回答済み</span>
                       )}
                       {settings.showTimestamp && q.createdAt && (
                         <span className="text-xs text-gray-300">
@@ -358,7 +358,7 @@ function PollCard({ poll, roomId, sessionId }: PollCardProps) {
   return (
     <div className={`bg-white rounded-2xl border shadow-sm ${poll.status === "active" ? "border-rimo-200" : "border-gray-100"}`}>
       <div className="px-4 pt-4 pb-1 flex items-center gap-2">
-        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${poll.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${poll.status === "active" ? "bg-rimo-100 text-rimo-700" : "bg-gray-100 text-gray-500"}`}>
           {poll.status === "active" ? "投票受付中" : "投票終了"}
         </span>
         {allowMultiple && (
