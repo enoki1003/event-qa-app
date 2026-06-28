@@ -137,11 +137,14 @@ export default function HostDashboard() {
                   <label className="text-sm font-medium text-gray-700">タイトル *</label>
                   <input type="text" value={form.title} onChange={(e) => upd({ title: e.target.value })}
                     className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300" required />
+                  <DashLengthHint text={form.title} threshold={20} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">説明</label>
-                  <textarea value={form.description} onChange={(e) => upd({ description: e.target.value })}
-                    rows={2} className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 resize-none" />
+                  <label className="text-sm font-medium text-gray-700">サブタイトル</label>
+                  <input type="text" value={form.description} onChange={(e) => upd({ description: e.target.value })}
+                    placeholder="例：〜AIで会議を変える〜"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300" />
+                  <DashLengthHint text={form.description} threshold={24} />
                 </div>
                 <div className="flex gap-3">
                   <div className="flex-1">
@@ -266,5 +269,18 @@ export default function HostDashboard() {
         )}
       </div>
     </div>
+  );
+}
+
+// ---- 文字数ヒント（タイトル・サブタイトル用）----
+function DashLengthHint({ text, threshold }: { text: string; threshold: number }) {
+  const len = text.length;
+  const over = len > threshold;
+  if (!len) return null;
+  return (
+    <p className={`text-xs mt-1 flex items-center gap-1 ${over ? "text-brand-orange-500" : "text-gray-400"}`}>
+      <span>{len}文字</span>
+      {over && <span>— スマホで折り返す可能性があります</span>}
+    </p>
   );
 }

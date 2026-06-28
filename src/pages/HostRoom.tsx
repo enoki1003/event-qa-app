@@ -1237,16 +1237,19 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
           className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
           required
         />
+        <LabelLengthHint label={title} placeholder="イベントタイトル" threshold={20} />
       </div>
 
       <div>
-        <label className="text-sm font-medium text-gray-700">イベント説明</label>
-        <textarea
+        <label className="text-sm font-medium text-gray-700">サブタイトル</label>
+        <input
+          type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          rows={2}
-          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 resize-none text-sm"
+          placeholder="例：〜AIで会議を変える〜"
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
         />
+        <LabelLengthHint label={description} placeholder="サブタイトル（任意）" threshold={24} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -1405,14 +1408,13 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
   );
 }
 
-// ---- ボタン文言の長さヒント ----
-// モバイル幅（375px）で text-sm font-semibold 日本語 ≈ 20文字が1行の目安
-const LABEL_WRAP_THRESHOLD = 20;
-
-function LabelLengthHint({ label, placeholder }: { label: string; placeholder: string }) {
+// ---- 文字数ヒント ----
+// threshold: モバイル（375px）で折り返す目安文字数
+// タイトル text-base bold ≈ 20文字、サブタイトル text-sm ≈ 24文字、ボタン文言 ≈ 20文字
+function LabelLengthHint({ label, placeholder, threshold = 20 }: { label: string; placeholder: string; threshold?: number }) {
   const text = label || placeholder;
   const len = text.length;
-  const over = len > LABEL_WRAP_THRESHOLD;
+  const over = len > threshold;
   return (
     <p className={`text-xs mt-1 flex items-center gap-1 ${over ? "text-brand-orange-500" : "text-gray-400"}`}>
       <span>{len}文字</span>

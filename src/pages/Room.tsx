@@ -223,7 +223,7 @@ export default function Room() {
       {/* 薄いsticky バー（ロゴのみ） */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-xl mx-auto px-4 py-2 flex items-center justify-end">
-          <img src="/rimo_logo.svg" alt="Rimo" className="h-4 opacity-60" />
+          <img src="/rimo_logo.svg" alt="Rimo" className="h-4 opacity-90" />
         </div>
       </div>
 
