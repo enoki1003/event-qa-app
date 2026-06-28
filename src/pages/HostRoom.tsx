@@ -1189,6 +1189,7 @@ function PollsPanel({
 interface SettingsPanelProps {
   room: {
     id: string;
+    eventName: string;
     title: string;
     description: string;
     eventDate: string;
@@ -1199,6 +1200,7 @@ interface SettingsPanelProps {
 }
 
 function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
+  const [eventName, setEventName] = useState(room.eventName || "");
   const [title, setTitle] = useState(room.title || "");
   const [description, setDescription] = useState(room.description || "");
   const [eventDate, setEventDate] = useState(room.eventDate || "");
@@ -1212,7 +1214,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
     e.preventDefault();
     setSaving(true);
     try {
-      await updateRoomSettings(room.id, title, description, eventDate, eventTime, settings);
+      await updateRoomSettings(room.id, eventName, title, description, eventDate, eventTime, settings);
       setSaved(true);
       onSaved();
       setTimeout(() => setSaved(false), 2000);
@@ -1227,6 +1229,18 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
   return (
     <form onSubmit={handleSave} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
       <h2 className="font-semibold text-gray-800">イベント設定</h2>
+
+      <div>
+        <label className="text-sm font-medium text-gray-700">イベント名</label>
+        <input
+          type="text"
+          value={eventName}
+          onChange={(e) => setEventName(e.target.value)}
+          placeholder="例：Rimoウェビナーシリーズ"
+          className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
+        />
+        <LabelLengthHint label={eventName} placeholder="Rimoウェビナーシリーズ" threshold={28} />
+      </div>
 
       <div>
         <label className="text-sm font-medium text-gray-700">タイトル</label>

@@ -31,6 +31,7 @@ function generateCode(): string {
 }
 
 export async function createRoom(
+  eventName: string,
   title: string,
   description: string,
   eventDate: string,
@@ -39,6 +40,7 @@ export async function createRoom(
 ): Promise<string> {
   const roomsRef = ref(db, "rooms");
   const result = await push(roomsRef, {
+    eventName,
     title,
     description,
     eventDate,
@@ -53,8 +55,8 @@ export async function createRoom(
   return result.key!;
 }
 
-export async function updateRoomSettings(roomId: string, title: string, description: string, eventDate: string, eventTime: string, settings: RoomSettings) {
-  await update(ref(db, `rooms/${roomId}`), { title, description, eventDate, eventTime, settings });
+export async function updateRoomSettings(roomId: string, eventName: string, title: string, description: string, eventDate: string, eventTime: string, settings: RoomSettings) {
+  await update(ref(db, `rooms/${roomId}`), { eventName, title, description, eventDate, eventTime, settings });
 }
 
 export async function deleteRoom(roomId: string) {
@@ -88,6 +90,7 @@ export async function deleteSession(roomId: string, sessionId: string) {
 export async function duplicateRoom(source: Room): Promise<string> {
   const roomsRef = ref(db, "rooms");
   const result = await push(roomsRef, {
+    eventName: source.eventName || "",
     title: `${source.title} (コピー)`,
     description: source.description || "",
     eventDate: source.eventDate || "",

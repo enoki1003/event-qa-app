@@ -8,6 +8,7 @@ export interface Session {
 
 export interface Room {
   id: string;
+  eventName: string;
   title: string;
   description: string;
   code: string;

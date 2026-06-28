@@ -230,9 +230,12 @@ export default function Room() {
       <div className="max-w-xl mx-auto px-4 pt-4 space-y-4">
         {/* イベントタイトル */}
         <div>
+          {room.eventName && (
+            <p className="text-xs text-gray-400 mb-0.5 leading-snug">{room.eventName}</p>
+          )}
           <h1 className="font-bold text-gray-900 text-base leading-snug">{room.title}</h1>
           {room.description && (
-            <p className="text-sm text-gray-500 mt-1 leading-snug">{room.description}</p>
+            <p className="text-sm text-gray-500 mt-0.5 leading-snug">{room.description}</p>
           )}
         </div>
         {/* CTAボタン */}

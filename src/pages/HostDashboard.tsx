@@ -25,6 +25,7 @@ const DEFAULT_SETTINGS: RoomSettings = {
 };
 
 interface FormState {
+  eventName: string;
   title: string;
   description: string;
   eventDate: string;
@@ -33,6 +34,7 @@ interface FormState {
 }
 
 const EMPTY_FORM: FormState = {
+  eventName: "",
   title: "",
   description: "",
   eventDate: "",
@@ -67,7 +69,7 @@ export default function HostDashboard() {
     if (!form.title.trim() || !form.eventDate || saving) return;
     setSaving(true);
     try {
-      const id = await createRoom(form.title, form.description, form.eventDate, form.eventTime, form.settings);
+      const id = await createRoom(form.eventName, form.title, form.description, form.eventDate, form.eventTime, form.settings);
       setShowCreate(false);
       navigate(`/host/room/${id}`);
     } finally {
@@ -133,6 +135,13 @@ export default function HostDashboard() {
             <div className="bg-white rounded-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
               <h2 className="font-bold text-gray-900 mb-4">新規イベント作成</h2>
               <form onSubmit={handleSave} className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">イベント名</label>
+                  <input type="text" value={form.eventName} onChange={(e) => upd({ eventName: e.target.value })}
+                    placeholder="例：Rimoウェビナーシリーズ"
+                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300" />
+                  <DashLengthHint text={form.eventName} threshold={28} />
+                </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700">タイトル *</label>
                   <input type="text" value={form.title} onChange={(e) => upd({ title: e.target.value })}
