@@ -120,8 +120,8 @@ export default function Room() {
                 href={room.settings.surveyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "#F7AF00" }}
+                className="block w-full py-3 text-sm font-semibold rounded-full text-center border transition-opacity hover:opacity-80 bg-white"
+                style={{ color: "#F18900", borderColor: "#F18900" }}
               >
                 {room.settings.surveyLabel || "アンケートに回答する"}
               </a>
@@ -253,8 +253,8 @@ export default function Room() {
             href={settings.surveyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90 shadow-sm"
-            style={{ backgroundColor: "#F7AF00" }}
+            className="block w-full py-3 text-sm font-semibold rounded-full text-center border transition-opacity hover:opacity-80 bg-white shadow-sm"
+            style={{ color: "#F18900", borderColor: "#F18900" }}
           >
             {settings.surveyLabel || "アンケートに回答する"}
           </a>
