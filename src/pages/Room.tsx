@@ -201,7 +201,7 @@ export default function Room() {
     <div className="min-h-screen bg-[#f5f5f5] pb-8">
       {/* 回答済み通知バナー */}
       {notification && (
-        <div className="fixed top-14 left-0 right-0 z-50 flex justify-center px-4 pt-2 pointer-events-none">
+        <div className="fixed top-9 left-0 right-0 z-50 flex justify-center px-4 pt-2 pointer-events-none">
           <div className="bg-white border border-rimo-200 rounded-xl shadow-lg px-4 py-3 max-w-sm w-full pointer-events-auto">
             <div className="flex items-start gap-3">
               <span className="text-rimo-500 flex-shrink-0 mt-0.5 text-base">💬</span>
@@ -220,20 +220,21 @@ export default function Room() {
         </div>
       )}
 
-      {/* ヘッダー */}
+      {/* 薄いsticky バー（ロゴのみ） */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="font-bold text-gray-900 truncate">{room.title}</h1>
-            {room.description && (
-              <p className="text-xs text-gray-400 mt-0.5 truncate">{room.description}</p>
-            )}
-          </div>
-          <img src="/rimo_logo.svg" alt="Rimo" className="h-5 flex-shrink-0 opacity-70" />
+        <div className="max-w-xl mx-auto px-4 py-2 flex items-center justify-end">
+          <img src="/rimo_logo.svg" alt="Rimo" className="h-4 opacity-60" />
         </div>
       </div>
 
       <div className="max-w-xl mx-auto px-4 pt-4 space-y-4">
+        {/* イベントタイトル */}
+        <div>
+          <h1 className="font-bold text-gray-900 text-base leading-snug">{room.title}</h1>
+          {room.description && (
+            <p className="text-sm text-gray-500 mt-1 leading-snug">{room.description}</p>
+          )}
+        </div>
         {/* CTAボタン */}
         {settings.ctaUrl && (
           <a
