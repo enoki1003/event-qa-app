@@ -155,16 +155,16 @@ export default function HostDashboard() {
                     className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300" />
                   <DashLengthHint text={form.description} threshold={24} />
                 </div>
-                <div className="flex gap-3">
-                  <div className="flex-1">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="min-w-0">
                     <label className="text-sm font-medium text-gray-700">開催日 *</label>
                     <input type="date" value={form.eventDate} onChange={(e) => upd({ eventDate: e.target.value })}
-                      className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300" required />
+                      className="mt-1 w-full min-w-0 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300" required />
                   </div>
-                  <div className="flex-1">
-                    <label className="text-sm font-medium text-gray-700">開催時間（任意）</label>
+                  <div className="min-w-0">
+                    <label className="text-sm font-medium text-gray-700">開始時刻（任意）</label>
                     <input type="time" value={form.eventTime} onChange={(e) => upd({ eventTime: e.target.value })}
-                      className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300" />
+                      className="mt-1 w-full min-w-0 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300" />
                   </div>
                 </div>
                 <div>

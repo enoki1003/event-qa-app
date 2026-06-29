@@ -1267,22 +1267,22 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div>
+        <div className="min-w-0">
           <label className="text-sm font-medium text-gray-700">開催日</label>
           <input
             type="date"
             value={eventDate}
             onChange={(e) => setEventDate(e.target.value)}
-            className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
+            className="mt-1 w-full min-w-0 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
           />
         </div>
-        <div>
+        <div className="min-w-0">
           <label className="text-sm font-medium text-gray-700">開始時刻（任意）</label>
           <input
             type="time"
             value={eventTime}
             onChange={(e) => setEventTime(e.target.value)}
-            className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
+            className="mt-1 w-full min-w-0 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm"
           />
         </div>
       </div>
