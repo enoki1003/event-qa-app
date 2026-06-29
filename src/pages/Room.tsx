@@ -288,7 +288,7 @@ export default function Room() {
         ))}
 
         {/* 投稿フォーム */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl border shadow-sm" style={{ borderColor: "#F18900" }}>
           <div className="px-4 pt-4 pb-1">
             <p className="text-sm font-semibold text-gray-800">質問を投稿する</p>
           </div>
