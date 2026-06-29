@@ -104,27 +104,31 @@ export default function Room() {
               本日はご参加いただき<br />
               誠にありがとうございました！
             </p>
-            {room.settings.ctaUrl && (
-              <a
-                href={room.settings.ctaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "#F18900" }}
-              >
-                {room.settings.ctaLabel || "無料相談の予約はこちら"}
-              </a>
-            )}
-            {room.settings.surveyUrl && (
-              <a
-                href={room.settings.surveyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3 text-sm font-semibold rounded-full text-center border transition-opacity hover:opacity-80 bg-white"
-                style={{ color: "#F18900", borderColor: "#F18900" }}
-              >
-                {room.settings.surveyLabel || "アンケートに回答する"}
-              </a>
+            {(room.settings.ctaUrl || room.settings.surveyUrl) && (
+              <div className="space-y-2">
+                {room.settings.ctaUrl && (
+                  <a
+                    href={room.settings.ctaUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: "#F18900" }}
+                  >
+                    {room.settings.ctaLabel || "無料相談の予約はこちら"}
+                  </a>
+                )}
+                {room.settings.surveyUrl && (
+                  <a
+                    href={room.settings.surveyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full py-3 text-sm font-semibold rounded-full text-center border transition-opacity hover:opacity-80 bg-white"
+                    style={{ color: "#F18900", borderColor: "#F18900" }}
+                  >
+                    {room.settings.surveyLabel || "アンケートに回答する"}
+                  </a>
+                )}
+              </div>
             )}
             {!room.settings.ctaUrl && !room.settings.surveyUrl && (
               <p className="text-sm text-gray-400">またのご参加をお待ちしています。</p>
@@ -238,30 +242,32 @@ export default function Room() {
             <p className="text-sm text-gray-500 mt-0.5 leading-snug">{room.description}</p>
           )}
         </div>
-        {/* CTAボタン */}
-        {settings.ctaUrl && (
-          <a
-            href={settings.ctaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90 shadow-sm"
-            style={{ backgroundColor: "#F18900" }}
-          >
-            {settings.ctaLabel || "詳細・お申し込みはこちら"}
-          </a>
-        )}
-
-        {/* アンケートボタン */}
-        {settings.surveyUrl && (
-          <a
-            href={settings.surveyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full py-3 text-sm font-semibold rounded-full text-center border transition-opacity hover:opacity-80 bg-white shadow-sm"
-            style={{ color: "#F18900", borderColor: "#F18900" }}
-          >
-            {settings.surveyLabel || "アンケートに回答する"}
-          </a>
+        {/* CTAボタン・アンケートボタン */}
+        {(settings.ctaUrl || settings.surveyUrl) && (
+          <div className="space-y-2">
+            {settings.ctaUrl && (
+              <a
+                href={settings.ctaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3 text-white text-sm font-semibold rounded-full text-center transition-opacity hover:opacity-90 shadow-sm"
+                style={{ backgroundColor: "#F18900" }}
+              >
+                {settings.ctaLabel || "詳細・お申し込みはこちら"}
+              </a>
+            )}
+            {settings.surveyUrl && (
+              <a
+                href={settings.surveyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3 text-sm font-semibold rounded-full text-center border transition-opacity hover:opacity-80 bg-white shadow-sm"
+                style={{ color: "#F18900", borderColor: "#F18900" }}
+              >
+                {settings.surveyLabel || "アンケートに回答する"}
+              </a>
+            )}
+          </div>
         )}
 
         {/* セッションバナー */}
