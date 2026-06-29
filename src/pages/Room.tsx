@@ -288,26 +288,26 @@ export default function Room() {
         ))}
 
         {/* 投稿フォーム */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
           <div className="px-4 pt-4 pb-1">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">質問を投稿する</p>
+            <p className="text-sm font-semibold text-gray-800">質問を投稿する</p>
           </div>
           <form onSubmit={handleSubmit} className="px-4 pb-4 pt-2">
             {showCompany && (
               <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)}
                 placeholder={`会社名${companyRequired ? "（必須）" : "（任意）"}`} maxLength={100}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 mb-2"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 mb-2"
                 required={companyRequired} />
             )}
             {showName && (
               <input type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)}
                 placeholder={`お名前${nameRequired ? "（必須）" : "（任意）"}`} maxLength={50}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 mb-2"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 mb-2"
                 required={nameRequired} />
             )}
             <textarea value={text} onChange={(e) => setText(e.target.value)}
               placeholder="質問を入力してください..." maxLength={1000} rows={3}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 resize-none"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 resize-none"
               required />
             <div className="flex items-center justify-between mt-2">
               <span className="text-xs text-gray-400">{text.length}/1000</span>
