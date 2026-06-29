@@ -443,7 +443,7 @@ function PollCard({ poll, roomId, sessionId }: PollCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border shadow-sm" style={{ borderColor: poll.status === "active" ? "#F18900" : "#e5e7eb" }}>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
       <div className="px-4 pt-4 pb-1 flex items-center gap-2">
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${poll.status === "active" ? "bg-rimo-100 text-rimo-700" : "bg-gray-100 text-gray-500"}`}>
           {poll.status === "active" ? "投票受付中" : "投票終了"}
