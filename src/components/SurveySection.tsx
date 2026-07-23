@@ -17,13 +17,27 @@ export function extractSheetId(urlOrId: string): string {
 function detectColType(values: SurveyCell[]): ColType {
   const nonEmpty = values.filter((v) => v !== "" && v !== null && v !== undefined);
   if (nonEmpty.length === 0) return "text";
+
+  // Numeric: all values are numbers
   if (nonEmpty.every((v) => typeof v === "number" || (typeof v === "string" && v !== "" && !isNaN(Number(v))))) {
     return "numeric";
   }
-  const multiCount = nonEmpty.filter((v) => String(v).includes(", ")).length;
+
+  // Checkbox (複数選択): `, ` or `、` で区切られた複数の値を含む
+  const multiCount = nonEmpty.filter((v) => {
+    const s = String(v);
+    return s.includes(", ") || s.includes("、");
+  }).length;
   if (multiCount / nonEmpty.length > 0.2) return "checkbox";
+
+  // 平均文字数が長い → 記述式（テキスト）
+  const avgLen = nonEmpty.reduce((sum, v) => sum + String(v).length, 0) / nonEmpty.length;
+  if (avgLen > 15) return "text";
+
+  // Categorical (択一選択): 値の種類が少なく、繰り返しが多い
   const unique = new Set(nonEmpty.map(String));
-  if (unique.size <= 10 || unique.size / nonEmpty.length < 0.5) return "categorical";
+  if (unique.size <= 6 && unique.size / nonEmpty.length < 0.4) return "categorical";
+
   return "text";
 }
 

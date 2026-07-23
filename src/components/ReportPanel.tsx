@@ -139,13 +139,13 @@ export function ReportPanel({
         <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">イベントサマリー</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: "アクセス人数", value: visitors.length, unit: "人", color: "text-rimo-600" },
-            { label: "投票数", value: activePollCount, unit: "件", color: "text-blue-500" },
-            { label: "質問数", value: totalQuestions, unit: "件", color: "text-amber-500" },
-            { label: "アンケート回答数", value: surveyCount ?? "—", unit: surveyCount !== null ? "件" : "", color: "text-emerald-500" },
+            { label: "アクセス人数", value: visitors.length, unit: "人" },
+            { label: "投票数", value: activePollCount, unit: "件" },
+            { label: "質問数", value: totalQuestions, unit: "件" },
+            { label: "アンケート回答数", value: surveyCount ?? "—", unit: surveyCount !== null ? "件" : "" },
           ].map((item) => (
             <div key={item.label} className="text-center py-2">
-              <p className={`text-3xl font-bold ${item.color}`}>
+              <p className="text-3xl font-bold text-gray-900">
                 {item.value}
                 {item.unit && <span className="text-base font-normal text-gray-400 ml-1">{item.unit}</span>}
               </p>
@@ -160,21 +160,21 @@ export function ReportPanel({
         <span className="text-xs text-gray-400 self-center">CSV ダウンロード:</span>
         <button
           onClick={() => exportAllCsv(questions, visitors, sessions, polls, room.title)}
-          className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
+          className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
         >
-          ↓ レポート全体
+          レポート全体
         </button>
         <button
           onClick={() => exportQuestionsCsv(questions, sessions, room.title)}
-          className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
+          className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
         >
-          ↓ 質問一覧
+          質問一覧
         </button>
         <button
           onClick={() => exportVisitorsCsv(visitors, room.title)}
-          className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
+          className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
         >
-          ↓ 参加者一覧
+          参加者一覧
         </button>
       </div>
 
