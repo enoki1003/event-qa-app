@@ -78,7 +78,15 @@ function QuestionCard({ header, children, count }: { header: string; children: R
   );
 }
 
-export function SurveySection({ sheetId, onCountLoaded }: { sheetId: string; onCountLoaded?: (n: number) => void }) {
+export function SurveySection({
+  sheetId,
+  onCountLoaded,
+  onRawDataLoaded,
+}: {
+  sheetId: string;
+  onCountLoaded?: (n: number) => void;
+  onRawDataLoaded?: (headers: string[], rows: (string | number)[][]) => void;
+}) {
   const [rows, setRows] = useState<SurveyRow[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +103,10 @@ export function SurveySection({ sheetId, onCountLoaded }: { sheetId: string; onC
       .then((data) => {
         setRows(data);
         setLoading(false);
-        if (Array.isArray(data) && data.length >= 2) onCountLoaded?.(data.length - 1);
+        if (Array.isArray(data) && data.length >= 2) {
+          onCountLoaded?.(data.length - 1);
+          onRawDataLoaded?.(data[0] as string[], data.slice(1));
+        }
       })
       .catch(() => { setError("データの取得に失敗しました"); setLoading(false); });
   }, [sheetId, gasUrl]); // eslint-disable-line react-hooks/exhaustive-deps

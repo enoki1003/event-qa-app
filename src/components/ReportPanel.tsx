@@ -24,56 +24,27 @@ function getVoteArr(v: unknown): number[] {
   return [];
 }
 
-function exportAllCsv(questions: Question[], visitors: Visitor[], sessions: Session[], polls: Poll[], roomTitle: string) {
-  const lines: string[] = [];
+function exportSurveyCsv(headers: string[], rows: (string | number)[][], roomTitle: string) {
+  const csvRows = [
+    headers,
+    ...rows.map((row) => headers.map((_, i) => String(row[i] ?? ""))),
+  ];
+  download("﻿" + csvRows.map((r) => r.map(csvCell).join(",")).join("\n"), `${roomTitle}_アンケート.csv`);
+}
 
-  lines.push("# 質問一覧");
-  lines.push(["No.", "投稿日時", "セッション", "質問内容", "会社名", "名前", "ステータス", "回答済み", "いいね数"].map(csvCell).join(","));
-  [...questions].sort((a, b) => a.createdAt - b.createdAt).forEach((q, i) => {
-    const session = sessions.find((s) => s.id === q.sessionId);
-    const statusLabel = q.status === "approved" ? "承認済み" : q.status === "rejected" ? "却下" : "保留中";
-    lines.push([
-      String(i + 1),
-      new Date(q.createdAt).toLocaleString("ja-JP"),
-      session?.title || "",
-      q.text,
-      q.companyName || "",
-      q.authorName || "",
-      statusLabel,
-      q.isAnswered ? "済" : "",
-      String(q.likes || 0),
-    ].map(csvCell).join(","));
-  });
-
-  lines.push("");
-  lines.push("# 参加者一覧");
-  lines.push(["アクセス日時", "会社名", "お名前", "質問数"].map(csvCell).join(","));
-  visitors.forEach((v) => {
-    const qCount = questions.filter((q) => q.browserSessionId === v.sessionId).length;
-    lines.push([
-      new Date(v.firstAccessAt).toLocaleString("ja-JP"),
-      v.companyName || "",
-      v.authorName || "",
-      String(qCount),
-    ].map(csvCell).join(","));
-  });
-
-  if (polls.length > 0) {
-    lines.push("");
-    lines.push("# 投票結果");
-    polls.forEach((poll) => {
-      lines.push(["投票タイトル", poll.title].map(csvCell).join(","));
-      const votes = poll.votes || {};
-      const respondents = Object.keys(votes).length;
-      poll.options.forEach((opt, i) => {
-        const count = Object.values(votes).filter((v) => getVoteArr(v).includes(i)).length;
-        const pct = respondents > 0 ? Math.round((count / respondents) * 100) : 0;
-        lines.push(["", opt, `${count}票`, `${pct}%`].map(csvCell).join(","));
-      });
+function exportPollsCsv(polls: Poll[], roomTitle: string) {
+  const lines: string[] = [["投票タイトル", "選択肢", "票数", "割合"].map(csvCell).join(",")];
+  polls.forEach((poll) => {
+    const votes = poll.votes || {};
+    const respondents = Object.keys(votes).length;
+    poll.options.forEach((opt, i) => {
+      const count = Object.values(votes).filter((v) => getVoteArr(v).includes(i)).length;
+      const pct = respondents > 0 ? Math.round((count / respondents) * 100) : 0;
+      lines.push([poll.title, opt, String(count), `${pct}%`].map(csvCell).join(","));
     });
-  }
-
-  download("﻿" + lines.join("\n"), `${roomTitle}_レポート.csv`);
+    lines.push("");
+  });
+  download("﻿" + lines.join("\n"), `${roomTitle}_投票結果.csv`);
 }
 
 function exportVisitorsCsv(visitors: Visitor[], roomTitle: string) {
@@ -127,6 +98,7 @@ export function ReportPanel({
 }: ReportPanelProps) {
   const [visitorSort, setVisitorSort] = useState<"access" | "questions">("access");
   const [surveyCount, setSurveyCount] = useState<number | null>(null);
+  const [surveyRawData, setSurveyRawData] = useState<{ headers: string[]; rows: (string | number)[][] } | null>(null);
 
   const totalQuestions = questions.length;
   const answeredQuestions = questions.filter((q) => q.isAnswered).length;
@@ -158,12 +130,23 @@ export function ReportPanel({
       {/* ── CSV ダウンロード ── */}
       <div className="flex gap-2 flex-wrap">
         <span className="text-xs text-gray-400 self-center">CSV ダウンロード:</span>
-        <button
-          onClick={() => exportAllCsv(questions, visitors, sessions, polls, room.title)}
-          className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
-        >
-          レポート全体
-        </button>
+        {room.settings.surveySheetId && (
+          <button
+            onClick={() => surveyRawData && exportSurveyCsv(surveyRawData.headers, surveyRawData.rows, room.title)}
+            disabled={!surveyRawData}
+            className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            アンケート
+          </button>
+        )}
+        {polls.length > 0 && (
+          <button
+            onClick={() => exportPollsCsv(polls, room.title)}
+            className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
+          >
+            投票結果
+          </button>
+        )}
         <button
           onClick={() => exportQuestionsCsv(questions, sessions, room.title)}
           className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
@@ -174,7 +157,7 @@ export function ReportPanel({
           onClick={() => exportVisitorsCsv(visitors, room.title)}
           className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
         >
-          参加者一覧
+          参加者
         </button>
       </div>
 
@@ -224,7 +207,11 @@ export function ReportPanel({
 
       {/* ── アンケート集計 ── */}
       {room.settings.surveySheetId && (
-        <SurveySection sheetId={room.settings.surveySheetId} onCountLoaded={setSurveyCount} />
+        <SurveySection
+          sheetId={room.settings.surveySheetId}
+          onCountLoaded={setSurveyCount}
+          onRawDataLoaded={(h, r) => setSurveyRawData({ headers: h, rows: r })}
+        />
       )}
 
       {/* ── 投票結果 ── */}
