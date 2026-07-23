@@ -91,6 +91,7 @@ export function SurveySection({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [surveyTab, setSurveyTab] = useState<"summary" | "individual">("summary");
+  const [individualIdx, setIndividualIdx] = useState(0);
 
   const gasUrl = import.meta.env.VITE_SURVEY_GAS_URL;
 
@@ -163,33 +164,49 @@ export function SurveySection({
         </div>
       </div>
 
-      {surveyTab === "individual" && (
-        <div className="space-y-3">
-          {dataRows.map((row, rowIdx) => {
-            const timestamp = row[0] ? String(row[0]) : null;
-            return (
-              <div key={rowIdx} className="border border-gray-100 rounded-xl p-4">
-                <p className="text-xs font-medium text-gray-400 mb-3">
-                  {rowIdx + 1}
-                  {timestamp && <span className="ml-2">{timestamp}</span>}
-                </p>
-                <div className="space-y-3">
-                  {headers.slice(1).map((header, colIdx) => {
-                    const val = row[colIdx + 1];
-                    if (val === "" || val === null || val === undefined) return null;
-                    return (
-                      <div key={colIdx}>
-                        <p className="text-xs text-gray-400 mb-0.5">{header}</p>
-                        <p className="text-sm text-gray-800 leading-snug">{String(val)}</p>
-                      </div>
-                    );
-                  })}
-                </div>
+      {surveyTab === "individual" && (() => {
+        const idx = Math.min(individualIdx, dataRows.length - 1);
+        const row = dataRows[idx];
+        const timestamp = row[0] ? String(row[0]) : null;
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => setIndividualIdx((i) => Math.max(0, i - 1))}
+                disabled={idx === 0}
+                className="px-3 py-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                ← 前へ
+              </button>
+              <span className="text-sm text-gray-400">
+                <span className="font-medium text-gray-700">{idx + 1}</span> / {dataRows.length}
+              </span>
+              <button
+                onClick={() => setIndividualIdx((i) => Math.min(dataRows.length - 1, i + 1))}
+                disabled={idx === dataRows.length - 1}
+                className="px-3 py-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                次へ →
+              </button>
+            </div>
+            <div className="border border-gray-100 rounded-xl p-4">
+              {timestamp && <p className="text-xs text-gray-400 mb-4">{timestamp}</p>}
+              <div className="space-y-4">
+                {headers.slice(1).map((header, colIdx) => {
+                  const val = row[colIdx + 1];
+                  if (val === "" || val === null || val === undefined) return null;
+                  return (
+                    <div key={colIdx}>
+                      <p className="text-xs text-gray-400 mb-0.5">{header}</p>
+                      <p className="text-sm text-gray-800 leading-snug">{String(val)}</p>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
-      )}
+            </div>
+          </div>
+        );
+      })()}
 
       {surveyTab === "summary" && <div className="space-y-4">
         {headers.slice(1).map((header, colIdx) => {
