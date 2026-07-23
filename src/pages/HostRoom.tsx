@@ -271,12 +271,6 @@ export default function HostRoom() {
               {room.isOpen ? "受付中" : "締切"}
             </button>
             <button
-              onClick={() => exportCsv(questions, room.title)}
-              className="px-2.5 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50"
-            >
-              CSV
-            </button>
-            <button
               onClick={() => navigate(`/host/room/${roomId}/report`)}
               className="px-2.5 py-1.5 border border-rimo-200 text-rimo-600 text-xs rounded-lg hover:bg-rimo-50 font-medium"
             >
