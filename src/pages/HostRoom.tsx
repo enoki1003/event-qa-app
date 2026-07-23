@@ -54,29 +54,6 @@ async function notifySlack(webhookUrl: string, question: Question, roomTitle: st
   } catch { /* サイレント */ }
 }
 
-function exportCsv(questions: Question[], roomTitle: string) {
-  const rows = [
-    ["ID", "セッション", "質問", "会社名", "投稿者", "ステータス", "回答済み", "投稿日時"],
-    ...questions.map((q) => [
-      q.id,
-      q.sessionTitle || "（セッションなし）",
-      `"${q.text.replace(/"/g, '""')}"`,
-      q.companyName || "",
-      q.authorName || "匿名",
-      q.status === "approved" ? "承認" : q.status === "rejected" ? "却下" : "承認待ち",
-      q.isAnswered ? "済" : "未",
-      new Date(q.createdAt).toLocaleString("ja-JP"),
-    ]),
-  ];
-  const csv = rows.map((r) => r.join(",")).join("\n");
-  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${roomTitle}_questions.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
 
 export default function HostRoom() {
   const { roomId } = useParams<{ roomId: string }>();
