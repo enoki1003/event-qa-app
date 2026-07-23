@@ -29,7 +29,7 @@ function detectColType(values: SurveyCell[]): ColType {
   if (hasMulti) return "checkbox";
 
   // 平均文字数が長い → 記述式（テキスト）
-  const avgLen = nonEmpty.reduce((sum, v) => sum + String(v).length, 0) / nonEmpty.length;
+  const avgLen = nonEmpty.reduce((sum: number, v) => sum + String(v).length, 0) / nonEmpty.length;
   if (avgLen > 15) return "text";
 
   // Categorical (択一選択): 値の種類が少なく繰り返しが多い
