@@ -30,6 +30,8 @@ import {
   togglePollHidden,
   deletePoll,
 } from "../hooks/usePolls";
+import { useVisitors } from "../hooks/useVisitors";
+import { ReportPanel } from "../components/ReportPanel";
 import type { AuthorMode, Poll, Question, RoomSettings, Session } from "../types";
 
 const AUTHOR_OPTIONS: { value: AuthorMode; label: string }[] = [
@@ -78,7 +80,7 @@ export default function HostRoom() {
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [newSessionDescription, setNewSessionDescription] = useState("");
   const [addingSession, setAddingSession] = useState(false);
-  const [tab, setTab] = useState<"questions" | "polls" | "sessions" | "settings">("questions");
+  const [tab, setTab] = useState<"questions" | "polls" | "sessions" | "report" | "settings">("questions");
   // session inline edit state
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editSessionTitle, setEditSessionTitle] = useState("");
@@ -86,6 +88,7 @@ export default function HostRoom() {
   const [savingSessionEdit, setSavingSessionEdit] = useState(false);
 
   const { polls } = usePolls(roomId ?? "");
+  const { visitors, loading: visitorsLoading } = useVisitors(roomId ?? "");
   // poll management state
   const [showPollForm, setShowPollForm] = useState(false);
   const [editingPollId, setEditingPollId] = useState<string | null>(null);
@@ -247,12 +250,6 @@ export default function HostRoom() {
             >
               {room.isOpen ? "受付中" : "締切"}
             </button>
-            <button
-              onClick={() => navigate(`/host/room/${roomId}/report`)}
-              className="px-2.5 py-1.5 border border-rimo-200 text-rimo-600 text-xs rounded-lg hover:bg-rimo-50 font-medium"
-            >
-              レポート
-            </button>
           </div>
         </div>
 
@@ -271,7 +268,7 @@ export default function HostRoom() {
 
         {/* Tabs */}
         <div className="max-w-4xl mx-auto px-4 flex gap-4 border-t border-gray-50">
-          {(["questions", "polls", "sessions", "settings"] as const).map((t) => (
+          {(["questions", "polls", "sessions", "report", "settings"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -281,7 +278,7 @@ export default function HostRoom() {
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
-              {t === "questions" ? "質問" : t === "polls" ? "投票" : t === "sessions" ? "セッション" : "設定"}
+              {t === "questions" ? "質問" : t === "polls" ? "投票" : t === "sessions" ? "セッション" : t === "report" ? "レポート" : "設定"}
             </button>
           ))}
         </div>
@@ -327,6 +324,18 @@ export default function HostRoom() {
       )}
 
       <div className="max-w-4xl mx-auto px-4 pt-4">
+        {/* ---- レポートタブ ---- */}
+        {tab === "report" && (
+          <ReportPanel
+            room={room}
+            sessions={sessions}
+            questions={questions}
+            visitors={visitors}
+            visitorsLoading={visitorsLoading}
+            polls={polls}
+          />
+        )}
+
         {/* ---- 投票タブ ---- */}
         {tab === "polls" && (
           <PollsPanel
