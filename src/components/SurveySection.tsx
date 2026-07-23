@@ -90,6 +90,7 @@ export function SurveySection({
   const [rows, setRows] = useState<SurveyRow[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [surveyTab, setSurveyTab] = useState<"summary" | "individual">("summary");
 
   const gasUrl = import.meta.env.VITE_SURVEY_GAS_URL;
 
@@ -142,11 +143,55 @@ export function SurveySection({
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-      <h2 className="font-semibold text-gray-800 mb-1">
-        アンケート集計
-        <span className="text-sm font-normal text-gray-400 ml-2">{responseCount} 件の回答</span>
-      </h2>
-      <div className="space-y-4 mt-4">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h2 className="font-semibold text-gray-800">
+          アンケート集計
+          <span className="text-sm font-normal text-gray-400 ml-2">{responseCount} 件の回答</span>
+        </h2>
+        <div className="flex gap-1">
+          {(["summary", "individual"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setSurveyTab(t)}
+              className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                surveyTab === t ? "bg-rimo-100 text-rimo-700 font-medium" : "text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              {t === "summary" ? "全体" : "個別"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {surveyTab === "individual" && (
+        <div className="space-y-3">
+          {dataRows.map((row, rowIdx) => {
+            const timestamp = row[0] ? String(row[0]) : null;
+            return (
+              <div key={rowIdx} className="border border-gray-100 rounded-xl p-4">
+                <p className="text-xs font-medium text-gray-400 mb-3">
+                  {rowIdx + 1}
+                  {timestamp && <span className="ml-2">{timestamp}</span>}
+                </p>
+                <div className="space-y-3">
+                  {headers.slice(1).map((header, colIdx) => {
+                    const val = row[colIdx + 1];
+                    if (val === "" || val === null || val === undefined) return null;
+                    return (
+                      <div key={colIdx}>
+                        <p className="text-xs text-gray-400 mb-0.5">{header}</p>
+                        <p className="text-sm text-gray-800 leading-snug">{String(val)}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {surveyTab === "summary" && <div className="space-y-4">
         {headers.slice(1).map((header, colIdx) => {
           const i = colIdx + 1;
           const values = dataRows.map((r) => r[i]).filter((v) => v !== "" && v !== null && v !== undefined);
@@ -263,7 +308,7 @@ export function SurveySection({
             </QuestionCard>
           );
         })}
-      </div>
+      </div>}
     </div>
   );
 }
