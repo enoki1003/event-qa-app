@@ -39,6 +39,7 @@ export interface RoomSettings {
   ctaUrl: string;
   surveyLabel: string;
   surveyUrl: string;
+  surveySheetId: string;
 }
 
 export interface Reply {

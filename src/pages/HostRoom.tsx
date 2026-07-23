@@ -1205,7 +1205,7 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
   const [description, setDescription] = useState(room.description || "");
   const [eventDate, setEventDate] = useState(room.eventDate || "");
   const [eventTime, setEventTime] = useState(room.eventTime || "");
-  const DEFAULT_S: RoomSettings = { authorMode: "anonymous", slackWebhookUrl: "", requireApproval: false, showTimestamp: false, replyAuthorLabel: "", ctaLabel: "", ctaUrl: "", surveyLabel: "", surveyUrl: "" };
+  const DEFAULT_S: RoomSettings = { authorMode: "anonymous", slackWebhookUrl: "", requireApproval: false, showTimestamp: false, replyAuthorLabel: "", ctaLabel: "", ctaUrl: "", surveyLabel: "", surveyUrl: "", surveySheetId: "" };
   const [settings, setSettings] = useState<RoomSettings>({ ...DEFAULT_S, ...room.settings });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -1393,6 +1393,17 @@ function SettingsPanel({ room, onSaved }: SettingsPanelProps) {
               placeholder="https://forms.google.com/..."
               className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm bg-white"
             />
+          </div>
+          <div>
+            <label className="text-xs text-gray-500">集計スプレッドシートURL（任意）</label>
+            <input
+              type="url"
+              value={settings.surveySheetId}
+              onChange={(e) => upd({ surveySheetId: e.target.value })}
+              placeholder="https://docs.google.com/spreadsheets/d/..."
+              className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rimo-300 text-sm bg-white"
+            />
+            <p className="text-xs text-gray-400 mt-1">Googleフォームの回答が入るスプレッドシートのURL</p>
           </div>
         </div>
       </div>

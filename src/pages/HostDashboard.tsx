@@ -22,6 +22,7 @@ const DEFAULT_SETTINGS: RoomSettings = {
   ctaUrl: "",
   surveyLabel: "",
   surveyUrl: "",
+  surveySheetId: "",
 };
 
 interface FormState {

@@ -7,6 +7,166 @@ import { useVisitors } from "../hooks/useVisitors";
 import { usePolls } from "../hooks/usePolls";
 import type { Session } from "../types";
 
+type SurveyCell = string | number;
+type SurveyRow = SurveyCell[];
+type ColType = "numeric" | "categorical" | "text";
+
+function extractSheetId(urlOrId: string): string {
+  const m = urlOrId.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : urlOrId.trim();
+}
+
+function detectColType(values: SurveyCell[]): ColType {
+  const nonEmpty = values.filter((v) => v !== "" && v !== null && v !== undefined);
+  if (nonEmpty.length === 0) return "text";
+  if (nonEmpty.every((v) => typeof v === "number" || (typeof v === "string" && v !== "" && !isNaN(Number(v))))) {
+    return "numeric";
+  }
+  const unique = new Set(nonEmpty.map(String));
+  if (unique.size <= 8 || unique.size / nonEmpty.length < 0.5) return "categorical";
+  return "text";
+}
+
+function SurveySection({ sheetId }: { sheetId: string }) {
+  const [rows, setRows] = useState<SurveyRow[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const gasUrl = import.meta.env.VITE_SURVEY_GAS_URL;
+
+  useEffect(() => {
+    const id = extractSheetId(sheetId);
+    if (!id || !gasUrl) { setLoading(false); return; }
+    setLoading(true);
+    setError(null);
+    fetch(`${gasUrl}?id=${id}`)
+      .then((r) => r.json())
+      .then((data) => { setRows(data); setLoading(false); })
+      .catch(() => { setError("データの取得に失敗しました"); setLoading(false); });
+  }, [sheetId, gasUrl]);
+
+  if (!gasUrl) return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <h2 className="font-semibold text-gray-800 mb-2">アンケート集計</h2>
+      <p className="text-sm text-gray-400">VITE_SURVEY_GAS_URL が未設定です</p>
+    </div>
+  );
+
+  if (loading) return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <h2 className="font-semibold text-gray-800 mb-2">アンケート集計</h2>
+      <p className="text-sm text-gray-400">読み込み中...</p>
+    </div>
+  );
+
+  if (error) return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <h2 className="font-semibold text-gray-800 mb-2">アンケート集計</h2>
+      <p className="text-sm text-red-400">{error}</p>
+    </div>
+  );
+
+  if (!rows || rows.length < 2) return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <h2 className="font-semibold text-gray-800 mb-2">アンケート集計</h2>
+      <p className="text-sm text-gray-400">回答がまだありません</p>
+    </div>
+  );
+
+  const headers = rows[0] as string[];
+  const dataRows = rows.slice(1);
+  const responseCount = dataRows.length;
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <h2 className="font-semibold text-gray-800 mb-1">
+        アンケート集計
+        <span className="text-sm font-normal text-gray-400 ml-2">{responseCount}件の回答</span>
+      </h2>
+      <div className="space-y-6 mt-4">
+        {headers.slice(1).map((header, colIdx) => {
+          const i = colIdx + 1;
+          const values = dataRows.map((r) => r[i]).filter((v) => v !== "" && v !== null && v !== undefined);
+          const type = detectColType(values);
+
+          if (type === "numeric") {
+            const nums = values.map(Number);
+            const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+            const counts: Record<number, number> = {};
+            nums.forEach((n) => { counts[n] = (counts[n] || 0) + 1; });
+            const sorted = Object.entries(counts).sort((a, b) => Number(a[0]) - Number(b[0]));
+            const max = Math.max(...Object.values(counts));
+            return (
+              <div key={i}>
+                <p className="font-medium text-gray-800 text-sm mb-1">{header}</p>
+                <p className="text-xs text-gray-400 mb-2">平均 <span className="font-semibold text-gray-700 text-sm">{avg.toFixed(1)}</span></p>
+                <div className="space-y-1.5">
+                  {sorted.map(([val, cnt]) => (
+                    <div key={val} className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 w-4 text-right flex-shrink-0">{val}</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-2">
+                        <div className="bg-rimo-500 h-2 rounded-full" style={{ width: `${(cnt / max) * 100}%` }} />
+                      </div>
+                      <span className="text-xs text-gray-400 flex-shrink-0">{cnt}件</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          if (type === "categorical") {
+            const counts: Record<string, number> = {};
+            values.forEach((v) => {
+              const key = String(v);
+              counts[key] = (counts[key] || 0) + 1;
+            });
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            const max = Math.max(...Object.values(counts));
+            return (
+              <div key={i}>
+                <p className="font-medium text-gray-800 text-sm mb-3">{header}</p>
+                <div className="space-y-2">
+                  {sorted.map(([val, cnt]) => {
+                    const pct = Math.round((cnt / values.length) * 100);
+                    return (
+                      <div key={val}>
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-gray-700 truncate max-w-xs">{val}</span>
+                          <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
+                            {cnt}件 <span className="text-gray-400">({pct}%)</span>
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-2">
+                          <div className="bg-rimo-500 h-2 rounded-full" style={{ width: `${(cnt / max) * 100}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
+
+          // text
+          return (
+            <div key={i}>
+              <p className="font-medium text-gray-800 text-sm mb-2">{header}</p>
+              <div className="space-y-1.5">
+                {values.map((v, j) => (
+                  <p key={j} className="text-sm text-gray-700 bg-gray-50 rounded-lg px-3 py-2 leading-snug">
+                    {String(v)}
+                  </p>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function csvCell(val: string): string {
   if (val.includes(",") || val.includes('"') || val.includes("\n")) {
     return `"${val.replace(/"/g, '""')}"`;
@@ -210,6 +370,11 @@ export default function HostReport() {
               })()}
             </div>
           </div>
+        )}
+
+        {/* アンケート集計 */}
+        {room.settings.surveySheetId && (
+          <SurveySection sheetId={room.settings.surveySheetId} />
         )}
 
         {/* 投票結果 */}
