@@ -23,20 +23,18 @@ function detectColType(values: SurveyCell[]): ColType {
     return "numeric";
   }
 
-  // Checkbox (複数選択): `, ` or `、` で区切られた複数の値を含む
-  const multiCount = nonEmpty.filter((v) => {
-    const s = String(v);
-    return s.includes(", ") || s.includes("、");
-  }).length;
-  if (multiCount / nonEmpty.length > 0.2) return "checkbox";
+  // Checkbox (複数選択): Google Forms は複数選択の値を ", " で区切る
+  // 1件でも ", " を含む値があれば checkbox（「、」は択一選択肢の文章に含まれる場合があるので除外）
+  const hasMulti = nonEmpty.some((v) => String(v).includes(", "));
+  if (hasMulti) return "checkbox";
 
   // 平均文字数が長い → 記述式（テキスト）
   const avgLen = nonEmpty.reduce((sum, v) => sum + String(v).length, 0) / nonEmpty.length;
   if (avgLen > 15) return "text";
 
-  // Categorical (択一選択): 値の種類が少なく、繰り返しが多い
+  // Categorical (択一選択): 値の種類が少なく繰り返しが多い
   const unique = new Set(nonEmpty.map(String));
-  if (unique.size <= 6 && unique.size / nonEmpty.length < 0.4) return "categorical";
+  if (unique.size <= 8 && unique.size / nonEmpty.length <= 0.5) return "categorical";
 
   return "text";
 }
