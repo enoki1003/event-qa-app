@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { QRCodeSVG, QRCodeCanvas } from "qrcode.react";
 import { ref, update } from "firebase/database";
 import { db } from "../firebase";
-import { isHostAuth } from "./HostLogin";
 import { useRoomById } from "../hooks/useRoom";
 import {
   useQuestions,
@@ -96,10 +95,6 @@ export default function HostRoom() {
   const [pollOptions, setPollOptions] = useState(["", "", "", "", ""]);
   const [pollAllowMultiple, setPollAllowMultiple] = useState(false);
   const [savingPoll, setSavingPoll] = useState(false);
-
-  useEffect(() => {
-    if (!isHostAuth()) navigate("/host");
-  }, [navigate]);
 
   if (!room) {
     return (
