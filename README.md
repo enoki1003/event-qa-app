@@ -14,8 +14,9 @@ Slido風のリアルタイムQ&Aアプリ。ウェビナー・イベントでの
 ### 1. Firebase プロジェクトの作成
 
 1. [Firebase Console](https://console.firebase.google.com/) でプロジェクトを作成
-2. **Realtime Database** を有効化（「テストモード」で開始）
-3. プロジェクト設定 > アプリ設定 から設定値を取得
+2. **Realtime Database** を有効化（「ロックモード」で開始。ルールは手順3でデプロイする）
+3. **Authentication** を有効化し、ログイン方法に **Google** を追加。承認済みドメインにデプロイ先（例: `event-qa-app.vercel.app`）を追加
+4. プロジェクト設定 > アプリ設定 から設定値を取得
 
 ### 2. 環境変数の設定
 
@@ -23,28 +24,20 @@ Slido風のリアルタイムQ&Aアプリ。ウェビナー・イベントでの
 cp .env.example .env.local
 ```
 
-`.env.local` にFirebaseの設定値とホストパスワードを入力する。
+`.env.local` にFirebaseの設定値を入力する。
 
-### 3. Firebaseセキュリティルール（推奨）
+### 3. Firebaseセキュリティルール（必須）
 
-Firebase Console > Realtime Database > ルール:
+ルールは `database.rules.json` で管理し、Firebase CLI でデプロイする（Console で直接編集しない）。
 
-```json
-{
-  "rules": {
-    "rooms": {
-      ".read": true,
-      ".write": true
-    },
-    "questions": {
-      ".read": true,
-      ".write": true
-    }
-  }
-}
+```bash
+npx firebase login
+npm run test:rules    # エミュレータでルールを検証（Java が必要）
+npm run deploy:rules
 ```
 
-本番環境ではより厳密なルールを設定すること。
+- 主催者 = `@rimo.app` のメール検証済み Google アカウント。ルーム・質問の管理、投票の作成、参加者一覧の閲覧は主催者のみ
+- 参加者（未ログイン）ができるのは、質問投稿（承認制ルームでは `pending` のみ）・いいね・実施中の投票への投票・自分の入室記録のみ
 
 ### 4. Slack通知のCORS設定
 
@@ -73,7 +66,7 @@ npm run build
 |-----|------|
 | `/` | 参加者トップ（ルームコード入力） |
 | `/room/:code` | 参加者Q&A画面 |
-| `/host` | 登壇者ログイン |
+| `/host` | 登壇者ログイン（@rimo.app の Google アカウント） |
 | `/host/dashboard` | イベント一覧・作成 |
 | `/host/room/:roomId` | 質問管理・承認・エクスポート |
 
