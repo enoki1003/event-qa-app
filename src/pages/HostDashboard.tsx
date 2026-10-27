@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { QRCodeSVG, QRCodeCanvas } from "qrcode.react";
-import { isHostAuth } from "./HostLogin";
 import { useRooms, createRoom, deleteRoom, duplicateRoom } from "../hooks/useRooms";
 import type { AuthorMode, Room, RoomSettings } from "../types";
 
@@ -60,10 +59,6 @@ export default function HostDashboard() {
   const [search, setSearch] = useState("");
   const [duplicating, setDuplicating] = useState<string | null>(null);
   const qrCanvasRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isHostAuth()) navigate("/host");
-  }, [navigate]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

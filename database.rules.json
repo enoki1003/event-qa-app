@@ -1,0 +1,70 @@
+{
+  "rules": {
+    "rooms": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email.matches(/.*@rimo\\.app$/)",
+      ".indexOn": ["code"]
+    },
+    "questions": {
+      "$roomId": {
+        ".read": true,
+        ".write": "auth != null && auth.token.email_verified == true && auth.token.email.matches(/.*@rimo\\.app$/)",
+        "$questionId": {
+          ".write": "!data.exists() && root.child('rooms').child($roomId).child('isOpen').val() == true && newData.child('roomId').val() == $roomId && newData.child('likes').val() == 0 && newData.child('isAnswered').val() == false && newData.child('isHidden').val() == false && !newData.child('replies').exists() && (newData.child('status').val() == 'pending' || (newData.child('status').val() == 'approved' && root.child('rooms').child($roomId).child('settings').child('requireApproval').val() != true))",
+          ".validate": "newData.hasChildren(['text', 'status', 'createdAt'])",
+          "text": {
+            ".validate": "newData.isString() && newData.val().length > 0"
+          },
+          "likes": {
+            ".write": "data.parent().exists() && newData.exists()",
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "likedBy": {
+            "$sessionId": {
+              ".write": "data.parent().parent().exists()",
+              ".validate": "newData.val() == true"
+            }
+          }
+        }
+      }
+    },
+    "polls": {
+      "$roomId": {
+        ".read": true,
+        ".write": "auth != null && auth.token.email_verified == true && auth.token.email.matches(/.*@rimo\\.app$/)",
+        "$pollId": {
+          "votes": {
+            "$sessionId": {
+              ".write": "newData.exists() && root.child('polls').child($roomId).child($pollId).child('status').val() == 'active'",
+              ".validate": "newData.hasChildren()",
+              "$index": {
+                ".validate": "newData.isNumber()"
+              }
+            }
+          }
+        }
+      }
+    },
+    "visitors": {
+      "$roomId": {
+        ".read": "auth != null && auth.token.email_verified == true && auth.token.email.matches(/.*@rimo\\.app$/)",
+        ".write": "auth != null && auth.token.email_verified == true && auth.token.email.matches(/.*@rimo\\.app$/)",
+        "$sessionId": {
+          ".read": true,
+          ".write": "newData.exists() && root.child('rooms').child($roomId).exists()",
+          ".validate": "newData.hasChild('firstAccessAt')"
+        }
+      }
+    },
+    "ratings": {
+      "$roomId": {
+        ".read": "auth != null && auth.token.email_verified == true && auth.token.email.matches(/.*@rimo\\.app$/)",
+        ".write": "auth != null && auth.token.email_verified == true && auth.token.email.matches(/.*@rimo\\.app$/)",
+        "$sessionId": {
+          ".write": "newData.exists() && root.child('rooms').child($roomId).exists()",
+          ".validate": "newData.isNumber()"
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,4 @@
-import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { isHostAuth } from "./HostLogin";
 import { useRoomById } from "../hooks/useRoom";
 import { useQuestions } from "../hooks/useQuestions";
 import { useVisitors } from "../hooks/useVisitors";
@@ -15,10 +13,6 @@ export default function HostReport() {
   const questions = useQuestions(roomId ?? "");
   const { visitors, loading: visitorsLoading } = useVisitors(roomId ?? "");
   const { polls } = usePolls(roomId ?? "");
-
-  useEffect(() => {
-    if (!isHostAuth()) navigate("/host");
-  }, [navigate]);
 
   if (!room) {
     return (
